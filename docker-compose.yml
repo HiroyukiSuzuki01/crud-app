@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  front:
+    container_name: 'front-app'
+    build: ./front-app
+    volumes:
+      - ./front-app:/usr/src/app
+    ports:
+      - '3000:3000'
+    tty: true
+    stdin_open: true
+    environment:
+      - WATCHPACK_POLLING=true
+    command: sh -C "npm run dev"

@@ -7,6 +7,7 @@ import {
   Select,
   TextField,
 } from "@mui/material";
+import Button from "@mui/material/Button";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -212,12 +213,18 @@ const Register = () => {
             </tr>
           </tbody>
         </table>
-        <button type="submit" onClick={confirmHandler}>
+
+        <Button type="submit" variant="contained" onClick={confirmHandler}>
           送る
-        </button>
-        <button type="button" onClick={() => dispatch(reset())}>
+        </Button>
+        <Button
+          type="button"
+          variant="contained"
+          color="warning"
+          onClick={() => dispatch(reset())}
+        >
           リセット
-        </button>
+        </Button>
       </form>
     </>
   );

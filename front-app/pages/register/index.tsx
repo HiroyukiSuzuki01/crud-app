@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useRouter } from "next/router";
 import {
   Checkbox,
@@ -6,6 +7,8 @@ import {
   MenuItem,
   Select,
   TextField,
+  OutlinedInput,
+  FormHelperText,
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import Radio from "@mui/material/Radio";
@@ -28,11 +31,37 @@ import {
   reset,
 } from "../../store/slices/registSlice";
 
+interface InputError {
+  isError: boolean;
+  errorReason: string;
+}
+
 const Register = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { name, age, gender, selfDescription, hobbies, prefecture, address } =
     useAppSelector(selectRegist);
+
+  const [nameError, setNameError] = useState<InputError>({
+    isError: false,
+    errorReason: "",
+  });
+  const [ageError, setAgeError] = useState<InputError>({
+    isError: false,
+    errorReason: "",
+  });
+  const [genderError, setGenderError] = useState<InputError>({
+    isError: false,
+    errorReason: "",
+  });
+  const [prefectureError, setPrefectureError] = useState<InputError>({
+    isError: false,
+    errorReason: "",
+  });
+  const [addressError, setAddressError] = useState<InputError>({
+    isError: false,
+    errorReason: "",
+  });
 
   // DBから取得予定
   const prefectures = [
@@ -52,7 +81,109 @@ const Register = () => {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
+
+    // Validation
+    if (
+      !inputNameCheck(name) ||
+      !inputAgeCheck(age) ||
+      !inputGenderCheck(gender) ||
+      !inputPrefectureCheck(prefecture) ||
+      !inputAddressCheck(address)
+    ) {
+      return;
+    }
+
     router.replace("/register/confirm");
+  };
+
+  const inputNameCheck = (name: string): boolean => {
+    let isError = false;
+    let errorReason = "";
+    let result = true;
+
+    if (!name) {
+      isError = true;
+      errorReason = "名前を入力してください";
+      result = false;
+    }
+
+    setNameError({ isError, errorReason });
+
+    return result;
+  };
+
+  const inputAgeCheck = (age: string): boolean => {
+    let isError = false;
+    let errorReason = "";
+    let result = true;
+
+    if (age === "") {
+      isError = true;
+      errorReason = "年齢を入力してください";
+      result = false;
+    }
+    if (+age < 0) {
+      isError = true;
+      errorReason = "年齢は0以上の数字を入力してください";
+      result = false;
+    }
+    if (isNaN(+age) && age) {
+      isError = true;
+      errorReason = "年齢は数字を入力してください";
+      result = false;
+    }
+
+    setAgeError({ isError, errorReason });
+
+    return result;
+  };
+
+  const inputGenderCheck = (gender: string): boolean => {
+    let isError = false;
+    let errorReason = "";
+    let result = true;
+
+    if (!gender) {
+      isError = true;
+      errorReason = "選択してください";
+      result = false;
+    }
+
+    setGenderError({ isError, errorReason });
+
+    return result;
+  };
+
+  const inputPrefectureCheck = (prefecture: string): boolean => {
+    let isError = false;
+    let errorReason = "";
+    let result = true;
+
+    if (prefecture === "-1") {
+      isError = true;
+      errorReason = "都道府県を選択してください";
+      result = false;
+    }
+
+    setPrefectureError({ isError, errorReason });
+
+    return result;
+  };
+
+  const inputAddressCheck = (address: string): boolean => {
+    let isError = false;
+    let errorReason = "";
+    let result = true;
+
+    if (!address) {
+      isError = true;
+      errorReason = "住所を入力してください";
+      result = false;
+    }
+
+    setAddressError({ isError, errorReason });
+
+    return result;
   };
 
   return (
@@ -62,32 +193,42 @@ const Register = () => {
           <tr>
             <td>名前</td>
             <td>
-              <TextField
-                value={name}
-                label="名前"
-                variant="outlined"
-                size="small"
-                onChange={(event) => dispatch(setName(event.target.value))}
-              />
+              <FormControl error={nameError.isError}>
+                <InputLabel htmlFor="name-input">名前</InputLabel>
+                <OutlinedInput
+                  id="name-input"
+                  label="名前"
+                  value={name}
+                  onChange={(event) => dispatch(setName(event.target.value))}
+                />
+                {nameError.isError && (
+                  <FormHelperText>{nameError.errorReason}</FormHelperText>
+                )}
+              </FormControl>
             </td>
           </tr>
           <tr>
             <td>年齢</td>
             <td>
-              <TextField
-                value={age}
-                label="年齢"
-                type="number"
-                variant="outlined"
-                size="small"
-                onChange={(event) => dispatch(setAge(event.target.value))}
-              />
+              <FormControl error={ageError.isError}>
+                <InputLabel htmlFor="age-input">年齢</InputLabel>
+                <OutlinedInput
+                  id="age-input"
+                  label="年齢"
+                  value={age}
+                  type="number"
+                  onChange={(event) => dispatch(setAge(event.target.value))}
+                />
+                {ageError.isError && (
+                  <FormHelperText>{ageError.errorReason}</FormHelperText>
+                )}
+              </FormControl>
             </td>
           </tr>
           <tr>
             <td>性別</td>
             <td>
-              <FormControl>
+              <FormControl error={genderError.isError}>
                 <RadioGroup row>
                   <FormControlLabel
                     value="1"
@@ -114,13 +255,16 @@ const Register = () => {
                     checked={gender === "2"}
                   />
                 </RadioGroup>
+                {genderError.isError && (
+                  <FormHelperText>{genderError.errorReason}</FormHelperText>
+                )}
               </FormControl>
             </td>
           </tr>
           <tr>
             <td>住所</td>
             <td>
-              <FormControl size="small">
+              <FormControl error={prefectureError.isError}>
                 <InputLabel id="prefecture-select-label">都道府県</InputLabel>
                 <Select
                   labelId="prefecture-select-label"
@@ -132,15 +276,23 @@ const Register = () => {
                 >
                   {prefecturesOption}
                 </Select>
+                {prefectureError.isError && (
+                  <FormHelperText>{prefectureError.errorReason}</FormHelperText>
+                )}
               </FormControl>
 
-              <TextField
-                value={address}
-                label="住所"
-                variant="outlined"
-                size="small"
-                onChange={(event) => dispatch(setAddress(event.target.value))}
-              />
+              <FormControl error={addressError.isError}>
+                <InputLabel htmlFor="address-input">住所</InputLabel>
+                <OutlinedInput
+                  id="address-input"
+                  label="住所"
+                  value={address}
+                  onChange={(event) => dispatch(setAddress(event.target.value))}
+                />
+                {addressError.isError && (
+                  <FormHelperText>{addressError.errorReason}</FormHelperText>
+                )}
+              </FormControl>
             </td>
           </tr>
           <tr>

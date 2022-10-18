@@ -6,7 +6,7 @@ export type RegistState = {
   age: string;
   selfDescription: string;
   gender: string;
-  hobby: string[];
+  hobbies: string[];
   prefecture: string;
   address: string;
 };
@@ -16,7 +16,7 @@ const initialState: RegistState = {
   age: "",
   gender: "",
   selfDescription: "",
-  hobby: [],
+  hobbies: [],
   prefecture: "-1",
   address: "",
 };
@@ -41,10 +41,12 @@ export const registSlice = createSlice({
       state.selfDescription = action.payload;
     },
     setHobby: (state, action: PayloadAction<string>) => {
-      if (state.hobby.includes(action.payload)) {
-        state.hobby = state.hobby.filter((hobby) => hobby !== action.payload);
+      if (state.hobbies.includes(action.payload)) {
+        state.hobbies = state.hobbies.filter(
+          (hobby) => hobby !== action.payload
+        );
       } else {
-        state.hobby = [...state.hobby, action.payload];
+        state.hobbies = [...state.hobbies, action.payload];
       }
     },
     setPrefecture: (
@@ -61,7 +63,7 @@ export const registSlice = createSlice({
       state.age = "";
       state.gender = "";
       state.selfDescription = "";
-      state.hobby = [];
+      state.hobbies = [];
       state.prefecture = "-1";
       state.address = "";
     },

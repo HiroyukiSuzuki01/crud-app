@@ -29,14 +29,14 @@ services:
     stdin_open: true
 
   db:
-    image: mariadb:latest
+    image: mysql:latest
     restart: always
     ports:
       - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
-    volumes:
-      - store-db:/var/lib/mysql
+#     volumes:
+#       - store-db:/var/lib/mysql
 
-volumes:
-  store-db:
+# volumes:
+#   store-db:

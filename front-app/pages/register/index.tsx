@@ -1,4 +1,3 @@
-import { TextField } from "@mui/material";
 import { useRouter } from "next/router";
 
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -47,9 +46,9 @@ const Register = () => {
             <tr>
               <td>名前</td>
               <td>
-                <TextField
-                  label="名前"
-                  variant="outlined"
+                <input
+                  type="text"
+                  value={name}
                   onChange={(event) => dispatch(setName(event.target.value))}
                 />
               </td>

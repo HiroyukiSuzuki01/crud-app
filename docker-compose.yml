@@ -1,42 +1,42 @@
-version: '3'
+version: "3"
 
 services:
   front:
-    container_name: 'front-app'
+    container_name: "front-app"
     build:
       context: ./front-app
       dockerfile: Dockerfile
     volumes:
       - ./front-app:/usr/src/app
     ports:
-      - '3000:3000'
+      - "3000:3000"
     tty: true
     stdin_open: true
     environment:
-     - WATCHPACK_POLLING=true
+      - WATCHPACK_POLLING=true
     command: sh -c "npm run dev"
 
   backend:
-    container_name: 'backend-app'
+    container_name: "backend-app"
     build:
       context: ./backend-app
       dockerfile: Dockerfile
     volumes:
       - ./backend-app:/go/src/app
     ports:
-      - '8000:8000'
+      - "8080:8080"
     tty: true
     stdin_open: true
-  
+
   db:
     image: mariadb:latest
     restart: always
     ports:
-      - '3306:3306'
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
     volumes:
       - store-db:/var/lib/mysql
-    
+
 volumes:
   store-db:

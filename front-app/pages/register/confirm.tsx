@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import axios from "axios";
+import Button from "@mui/material/Button";
 
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { reset, selectRegist } from "../../store/slices/registSlice";
@@ -7,7 +8,7 @@ import { reset, selectRegist } from "../../store/slices/registSlice";
 const Confirm = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { name, age, gender, selfDescription, hobby, prefecture, address } =
+  const { name, age, gender, selfDescription, hobbies, prefecture, address } =
     useAppSelector(selectRegist);
 
   const genderDisplay = (gender: string) => {
@@ -60,12 +61,17 @@ const Confirm = () => {
           </tr>
         </tbody>
       </table>
-      <button type="button" onClick={registHandler}>
+      <Button type="button" variant="contained" onClick={registHandler}>
         登録する
-      </button>
-      <button type="button" onClick={backInputView}>
+      </Button>
+      <Button
+        type="button"
+        variant="contained"
+        color="warning"
+        onClick={backInputView}
+      >
         戻る
-      </button>
+      </Button>
     </>
   );
 };

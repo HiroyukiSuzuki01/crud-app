@@ -1,4 +1,19 @@
 import { useRouter } from "next/router";
+import {
+  Checkbox,
+  FormGroup,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
+import Button from "@mui/material/Button";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
+import IconButton from "@mui/material/IconButton";
+import PhotoCamera from "@mui/icons-material/PhotoCamera";
 
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -16,7 +31,7 @@ import {
 const Register = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { name, age, gender, selfDescription, hobby, prefecture, address } =
+  const { name, age, gender, selfDescription, hobbies, prefecture, address } =
     useAppSelector(selectRegist);
 
   // DBから取得予定
@@ -28,139 +43,194 @@ const Register = () => {
   const prefecturesSelect = [{ id: "-1", name: "未設定" }, ...prefectures];
 
   const prefecturesOption = prefecturesSelect.map((prefecture) => (
-    <option value={prefecture.id} key={prefecture.id}>
+    <MenuItem key={prefecture.id} value={prefecture.id}>
       {prefecture.name}
-    </option>
+    </MenuItem>
   ));
 
-  const submitHandler = (event: any) => {
+  const confirmHandler = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     event.preventDefault();
     router.replace("/register/confirm");
   };
 
   return (
     <>
-      <form>
-        <table>
-          <tbody>
-            <tr>
-              <td>名前</td>
-              <td>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(event) => dispatch(setName(event.target.value))}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>年齢</td>
-              <td>
-                <input
-                  type="text"
-                  value={age}
-                  onChange={(event) => dispatch(setAge(event.target.value))}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>性別</td>
-              <td>
-                <label>
-                  <input
-                    type="radio"
+      <table>
+        <tbody>
+          <tr>
+            <td>名前</td>
+            <td>
+              <TextField
+                value={name}
+                label="名前"
+                variant="outlined"
+                size="small"
+                onChange={(event) => dispatch(setName(event.target.value))}
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>年齢</td>
+            <td>
+              <TextField
+                value={age}
+                label="年齢"
+                type="number"
+                variant="outlined"
+                size="small"
+                onChange={(event) => dispatch(setAge(event.target.value))}
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>性別</td>
+            <td>
+              <FormControl>
+                <RadioGroup row>
+                  <FormControlLabel
                     value="1"
+                    control={
+                      <Radio
+                        onChange={(event) =>
+                          dispatch(setGender(event.target.value))
+                        }
+                      />
+                    }
+                    label="男性"
                     checked={gender === "1"}
-                    onChange={(event) =>
-                      dispatch(setGender(event.target.value))
-                    }
                   />
-                  男性
-                </label>
-                <label>
-                  <input
-                    type="radio"
+                  <FormControlLabel
                     value="2"
-                    checked={gender === "2"}
-                    onChange={(event) =>
-                      dispatch(setGender(event.target.value))
+                    control={
+                      <Radio
+                        onChange={(event) =>
+                          dispatch(setGender(event.target.value))
+                        }
+                      />
                     }
+                    label="女性"
+                    checked={gender === "2"}
                   />
-                  女性
-                </label>
-              </td>
-            </tr>
-            <tr>
-              <td>住所</td>
-              <td>
-                <select
+                </RadioGroup>
+              </FormControl>
+            </td>
+          </tr>
+          <tr>
+            <td>住所</td>
+            <td>
+              <FormControl size="small">
+                <InputLabel id="prefecture-select-label">都道府県</InputLabel>
+                <Select
+                  labelId="prefecture-select-label"
+                  label="都道府県"
                   value={prefecture}
                   onChange={(event) =>
                     dispatch(setPrefecture(event.target.value))
                   }
                 >
                   {prefecturesOption}
-                </select>
-                <input
-                  type="text"
-                  value={address}
-                  onChange={(event) => dispatch(setAddress(event.target.value))}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>趣味</td>
-              <td>
-                <label>
-                  <input
-                    type="checkbox"
+                </Select>
+              </FormControl>
+
+              <TextField
+                value={address}
+                label="住所"
+                variant="outlined"
+                size="small"
+                onChange={(event) => dispatch(setAddress(event.target.value))}
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>趣味</td>
+            <td>
+              <FormControl component="fieldset">
+                <FormGroup aria-label="position" row>
+                  <FormControlLabel
                     value="1"
-                    onChange={(event) => dispatch(setHobby(event.target.value))}
+                    control={
+                      <Checkbox
+                        onChange={(event) =>
+                          dispatch(setHobby(event.target.value))
+                        }
+                      />
+                    }
+                    label="映画鑑賞"
+                    labelPlacement="end"
+                    checked={hobbies.includes("1")}
                   />
-                  映画鑑賞
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
+                  <FormControlLabel
                     value="2"
-                    onChange={(event) => dispatch(setHobby(event.target.value))}
+                    control={
+                      <Checkbox
+                        onChange={(event) =>
+                          dispatch(setHobby(event.target.value))
+                        }
+                      />
+                    }
+                    label="読書"
+                    labelPlacement="end"
+                    checked={hobbies.includes("2")}
                   />
-                  読書
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
+                  <FormControlLabel
                     value="3"
-                    onChange={(event) => dispatch(setHobby(event.target.value))}
+                    control={
+                      <Checkbox
+                        onChange={(event) =>
+                          dispatch(setHobby(event.target.value))
+                        }
+                      />
+                    }
+                    label="買い物"
+                    labelPlacement="end"
+                    checked={hobbies.includes("3")}
                   />
-                  買い物
-                </label>
-              </td>
-            </tr>
-            <tr>
-              <td>自己紹介</td>
-              <td>
-                <textarea
-                  value={selfDescription}
-                  onChange={(event) =>
-                    dispatch(setSelfDescription(event.target.value))
-                  }
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>写真</td>
-              <td>test</td>
-            </tr>
-          </tbody>
-        </table>
-        <button type="submit" onClick={submitHandler}>
-          送る
-        </button>
-        <button type="button" onClick={() => dispatch(reset())}>
-          リセット
-        </button>
-      </form>
+                </FormGroup>
+              </FormControl>
+            </td>
+          </tr>
+          <tr>
+            <td>自己紹介</td>
+            <td>
+              <TextField
+                value={selfDescription}
+                label="自己紹介"
+                multiline
+                rows={4}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                onChange={(event) =>
+                  dispatch(setSelfDescription(event.target.value))
+                }
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>写真</td>
+            <td>
+              <IconButton color="primary" aria-label="upload picture">
+                <input hidden accept="/*" type="file" />
+                <PhotoCamera />
+              </IconButton>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <Button type="button" variant="contained" onClick={confirmHandler}>
+        送る
+      </Button>
+      <Button
+        type="button"
+        variant="contained"
+        color="warning"
+        onClick={() => dispatch(reset())}
+      >
+        リセット
+      </Button>
     </>
   );
 };

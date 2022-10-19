@@ -1,9 +1,11 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import registSlice from "./slices/registSlice";
+import masterDataSlice from "./slices/masterDataSlice";
 
 export const store = configureStore({
   reducer: {
     regist: registSlice,
+    masterData: masterDataSlice,
   },
 });
 

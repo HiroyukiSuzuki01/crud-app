@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { reset, selectRegist } from "../../store/slices/registSlice";
+import { StringDecoder } from "string_decoder";
 
 const Confirm = () => {
   const router = useRouter();

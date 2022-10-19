@@ -1,4 +1,5 @@
-import { useState } from "react";
+import axios from "axios";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import {
   Checkbox,
@@ -30,6 +31,12 @@ import {
   selectRegist,
   reset,
 } from "../../store/slices/registSlice";
+import {
+  setPrefectures,
+  setPrefecturesById,
+  selectPrefectures,
+} from "../../store/slices/masterDataSlice";
+import { StringifyOptions } from "querystring";
 
 interface InputError {
   isError: boolean;
@@ -41,6 +48,15 @@ const Register = () => {
   const dispatch = useAppDispatch();
   const { name, age, gender, selfDescription, hobbies, prefecture, address } =
     useAppSelector(selectRegist);
+
+  useEffect(() => {
+    const getMasterData = async () => {
+      const { data } = await axios.get(`http://localhost:8080/prefectures`);
+      dispatch(setPrefectures(data));
+      dispatch(setPrefecturesById(data));
+    };
+    getMasterData();
+  }, []);
 
   const [nameError, setNameError] = useState<InputError>({
     isError: false,
@@ -63,17 +79,12 @@ const Register = () => {
     errorReason: "",
   });
 
-  // DBから取得予定
-  const prefectures = [
-    { id: "1", name: "北海道" },
-    { id: "47", name: "沖縄" },
-  ];
-
-  const prefecturesSelect = [{ id: "-1", name: "未設定" }, ...prefectures];
+  const prefectures = useAppSelector(selectPrefectures);
+  const prefecturesSelect = [{ ID: "-1", Name: "未設定" }, ...prefectures];
 
   const prefecturesOption = prefecturesSelect.map((prefecture) => (
-    <MenuItem key={prefecture.id} value={prefecture.id}>
-      {prefecture.name}
+    <MenuItem key={`${prefecture.ID}-${prefecture.Name}`} value={prefecture.ID}>
+      {prefecture.Name}
     </MenuItem>
   ));
 

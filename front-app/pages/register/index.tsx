@@ -36,7 +36,6 @@ import {
   setPrefecturesById,
   selectPrefectures,
 } from "../../store/slices/masterDataSlice";
-import { StringifyOptions } from "querystring";
 
 interface InputError {
   isError: boolean;

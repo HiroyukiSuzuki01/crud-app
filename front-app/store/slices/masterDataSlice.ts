@@ -25,7 +25,11 @@ const initialState: MasterDataState = {
     { ID: "2", Name: "読書" },
     { ID: "3", Name: "買い物" },
   ],
-  hobbiesById: {},
+  hobbiesById: {
+    "1": { ID: "1", Name: "映画鑑賞" },
+    "2": { ID: "2", Name: "読書" },
+    "3": { ID: "3", Name: "買い物" },
+  },
 };
 
 const createById = (masterData: Master[], byId: MasterById) => {

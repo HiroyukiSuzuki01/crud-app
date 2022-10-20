@@ -4,19 +4,41 @@ import Button from "@mui/material/Button";
 
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { reset, selectRegist } from "../../store/slices/registSlice";
+import {
+  selectPrefecturesById,
+  selectedHobbiesById,
+} from "../../store/slices/masterDataSlice";
+
+const HOKKAIDO_ID = "1";
+const TOKYO_ID = "13";
+const PREF_ARR = ["26", "27"];
 
 const Confirm = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { name, age, gender, selfDescription, hobbies, prefecture, address } =
     useAppSelector(selectRegist);
+  const prefecturesById = useAppSelector(selectPrefecturesById);
+  const hobbiesById = useAppSelector(selectedHobbiesById);
 
   const genderDisplay = (gender: string) => {
     return gender === "1" ? "男性" : "女性";
   };
 
   const createDisplayAddress = (prefecture: string, address: string) => {
-    return `${prefecture} ${address}`;
+    const suffix = prefectureSuffix(prefecture);
+    // 戻るボタンで入力項目の初期化対応
+    if (prefecture === "-1") return "";
+
+    return `${prefecturesById[prefecture].Name}${suffix} ${address}`;
+  };
+
+  const prefectureSuffix = (prefecture: string) => {
+    if (prefecture === HOKKAIDO_ID) return "";
+    if (prefecture === TOKYO_ID) return "都";
+    if (PREF_ARR.includes(prefecture)) return "府";
+
+    return "県";
   };
 
   const backInputView = () => {
@@ -27,8 +49,14 @@ const Confirm = () => {
   const registHandler = async () => {
     const url = "http://localhost:8080/";
     const response = await axios.get(url);
-    console.log(response);
-    console.log("regist");
+  };
+
+  const createDisplayHobbies = () => {
+    const hobbyConv = hobbies
+      .map((hobby) => hobbiesById[hobby].Name)
+      .join("　");
+
+    return hobbyConv;
   };
 
   return (
@@ -53,7 +81,7 @@ const Confirm = () => {
           </tr>
           <tr>
             <td>趣味</td>
-            <td></td>
+            <td>{createDisplayHobbies()}</td>
           </tr>
           <tr>
             <td>自己紹介</td>

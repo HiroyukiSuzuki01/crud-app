@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import Button from "@mui/material/Button";
@@ -8,12 +9,15 @@ import {
   selectPrefecturesById,
   selectedHobbiesById,
 } from "../../store/slices/masterDataSlice";
+import { Alert, Backdrop, CircularProgress, Snackbar } from "@mui/material";
 
 const HOKKAIDO_ID = "1";
 const TOKYO_ID = "13";
 const PREF_ARR = ["26", "27"];
 
 const Confirm = () => {
+  const [progress, setProgress] = useState(false);
+  const [failed, setFailed] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { name, age, gender, selfDescription, hobbies, prefecture, address } =
@@ -47,6 +51,7 @@ const Confirm = () => {
   };
 
   const registHandler = async () => {
+    setProgress(true);
     const registData = {
       name,
       age,
@@ -58,7 +63,13 @@ const Confirm = () => {
     };
     // envにurlを寄せたい
     const url = "http://localhost:8080/regist";
-    const response = await axios.post(url, registData);
+    try {
+      await axios.post(url, registData);
+    } catch (e) {
+      console.error(e);
+      setProgress(false);
+      setFailed(true);
+    }
   };
 
   const createDisplayHobbies = () => {
@@ -67,6 +78,10 @@ const Confirm = () => {
       .join("　");
 
     return hobbyConv;
+  };
+
+  const closeSnackBar = () => {
+    setFailed(false);
   };
 
   return (
@@ -110,6 +125,19 @@ const Confirm = () => {
       >
         戻る
       </Button>
+
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={progress}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
+      <Snackbar open={failed} autoHideDuration={6000} onClose={closeSnackBar}>
+        <Alert onClose={closeSnackBar} severity="error" sx={{ width: "100%" }}>
+          登録に失敗しました
+        </Alert>
+      </Snackbar>
     </>
   );
 };

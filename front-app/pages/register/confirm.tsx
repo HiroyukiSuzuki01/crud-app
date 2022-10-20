@@ -47,8 +47,18 @@ const Confirm = () => {
   };
 
   const registHandler = async () => {
-    const url = "http://localhost:8080/";
-    const response = await axios.get(url);
+    const registData = {
+      name,
+      age,
+      gender,
+      selfDescription,
+      hobbies,
+      prefecture,
+      address,
+    };
+    // envにurlを寄せたい
+    const url = "http://localhost:8080/regist";
+    const response = await axios.post(url, registData);
   };
 
   const createDisplayHobbies = () => {

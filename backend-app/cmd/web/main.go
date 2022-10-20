@@ -4,8 +4,10 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/rs/cors"
@@ -17,6 +19,17 @@ var db *sql.DB
 type Master struct {
 	ID   string
 	Name string
+}
+
+// RegistData type
+type registData struct {
+	Name            string   `json:"name"`
+	Age             string   `json:"age"`
+	Gender          string   `json:"gender"`
+	SelfDescription string   `json:"selfDescription"`
+	Hobbies         []string `json:"hobbies"`
+	Prefecture      string   `json:"prefecture"`
+	Address         string   `json:"address"`
 }
 
 func main() {
@@ -45,7 +58,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/masterData", masterDataHandler)
-	// mux.HandleFunc("/regist", registHandler)
+	mux.HandleFunc("/regist", registHandler)
 	handler := cors.Default().Handler(mux)
 	http.ListenAndServe(":8080", handler)
 }
@@ -64,7 +77,7 @@ func masterDataHandler(w http.ResponseWriter, r *http.Request) {
 		// w.Write(err)
 		return
 	}
-	masterData := map[string][]Master{"prefectures": prefectures, "hobbies": hobbies}
+	masterData := map[string][]Master{"allPrefectures": prefectures, "allHobbies": hobbies}
 	res, err := json.Marshal(masterData)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -121,19 +134,43 @@ func hobbiesAll() ([]Master, error) {
 	return hobbies, nil
 }
 
-// func registHandler(w http.ResponseWriter, r *http.Request) {
-// 	// 処理
-// 	regist(r)
-// 	fmt.Fprintf(w, "testaa")
-// 	w.WriteHeader(http.StatusOK)
-// }
+func registHandler(w http.ResponseWriter, r *http.Request) {
+	// 処理
+	regist(r)
+	w.WriteHeader(http.StatusOK)
+}
 
-// func regist(r *http.Request) {
-// 	body, err := io.ReadAll(r.Body)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	}
-// 	defer r.Body.Close()
+func regist(r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer r.Body.Close()
 
-// 	fmt.Println(body)
-// }
+	var registData registData
+	if err := json.Unmarshal(body, &registData); err != nil {
+		fmt.Println(err)
+	}
+
+	result, err := db.Exec(
+		"INSERT INTO user_profiles(name, age, gender, selfDescription, prefecture_id, address, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+		registData.Name, registData.Age, registData.Gender, registData.SelfDescription, registData.Prefecture, registData.Address, time.Now(), time.Now())
+	if err != nil {
+		fmt.Println(err)
+	}
+	UserID, err := result.LastInsertId()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if len(registData.Hobbies) != 0 {
+		for _, hobby := range registData.Hobbies {
+			_, err := db.Exec("INSERT INTO user_profile_hobby(user_id, hobby_id, created_at, updated_at) VALUES(?, ?, ?, ?)",
+				UserID, hobby, time.Now(), time.Now())
+
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+	}
+}

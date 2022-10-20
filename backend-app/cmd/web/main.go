@@ -44,29 +44,10 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/prefectures", prefectureHandler)
 	mux.HandleFunc("/masterData", masterDataHandler)
 	// mux.HandleFunc("/regist", registHandler)
 	handler := cors.Default().Handler(mux)
 	http.ListenAndServe(":8080", handler)
-}
-
-func prefectureHandler(w http.ResponseWriter, r *http.Request) {
-	prefectures, err := prefectureAll()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		// w.Write(err)
-		return
-	}
-	res, err := json.Marshal(prefectures)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		// w.Write([]byte(err))
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write(res)
 }
 
 func masterDataHandler(w http.ResponseWriter, r *http.Request) {

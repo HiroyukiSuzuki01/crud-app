@@ -20,16 +20,8 @@ export type MasterDataState = {
 const initialState: MasterDataState = {
   prefectures: [],
   prefecturesById: {},
-  hobbies: [
-    { ID: "1", Name: "映画鑑賞" },
-    { ID: "2", Name: "読書" },
-    { ID: "3", Name: "買い物" },
-  ],
-  hobbiesById: {
-    "1": { ID: "1", Name: "映画鑑賞" },
-    "2": { ID: "2", Name: "読書" },
-    "3": { ID: "3", Name: "買い物" },
-  },
+  hobbies: [],
+  hobbiesById: {},
 };
 
 const createById = (masterData: Master[], byId: MasterById) => {
@@ -48,22 +40,14 @@ export const masterDataSlice = createSlice({
       action: PayloadAction<typeof initialState.prefectures>
     ) => {
       state.prefectures = action.payload;
-    },
-    setPrefecturesById: (
-      state,
-      action: PayloadAction<typeof initialState.prefectures>
-    ) => {
+
       const prefecturesById: MasterById = {};
       createById(action.payload, prefecturesById);
       state.prefecturesById = prefecturesById;
     },
     setHobbies: (state, action: PayloadAction<typeof initialState.hobbies>) => {
       state.hobbies = action.payload;
-    },
-    setHobbiesbyId: (
-      state,
-      action: PayloadAction<typeof initialState.hobbies>
-    ) => {
+
       const hobbiesById: MasterById = {};
       createById(action.payload, hobbiesById);
       state.hobbiesById = hobbiesById;
@@ -71,7 +55,7 @@ export const masterDataSlice = createSlice({
   },
 });
 
-export const { setPrefectures, setPrefecturesById } = masterDataSlice.actions;
+export const { setPrefectures, setHobbies } = masterDataSlice.actions;
 
 export const selectPrefectures = (state: RootState) =>
   state.masterData.prefectures;

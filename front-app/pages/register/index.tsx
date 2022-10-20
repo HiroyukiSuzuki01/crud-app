@@ -33,9 +33,9 @@ import {
 } from "../../store/slices/registSlice";
 import {
   setPrefectures,
-  setPrefecturesById,
   selectPrefectures,
   selectedHobbies,
+  setHobbies,
 } from "../../store/slices/masterDataSlice";
 
 interface InputError {
@@ -72,9 +72,9 @@ const Register = () => {
 
   useEffect(() => {
     const getMasterData = async () => {
-      const { data } = await axios.get(`http://localhost:8080/prefectures`);
-      dispatch(setPrefectures(data));
-      dispatch(setPrefecturesById(data));
+      const { data } = await axios.get(`http://localhost:8080/masterData`);
+      dispatch(setPrefectures(data.prefectures));
+      dispatch(setHobbies(data.hobbies));
     };
     getMasterData();
   }, []);

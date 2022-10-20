@@ -32,31 +32,29 @@ import {
   reset,
 } from "../../store/slices/registSlice";
 import {
+  Master,
   setPrefectures,
-  setPrefecturesById,
   selectPrefectures,
+  selectedHobbies,
+  setHobbies,
 } from "../../store/slices/masterDataSlice";
-import { StringifyOptions } from "querystring";
 
 interface InputError {
   isError: boolean;
   errorReason: string;
 }
 
-const Register = () => {
+interface MasterDataProps {
+  allPrefectures: Master[];
+  allHobbies: Master[];
+}
+
+const Register = (props: MasterDataProps) => {
+  const { allPrefectures, allHobbies } = props;
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { name, age, gender, selfDescription, hobbies, prefecture, address } =
     useAppSelector(selectRegist);
-
-  useEffect(() => {
-    const getMasterData = async () => {
-      const { data } = await axios.get(`http://localhost:8080/prefectures`);
-      dispatch(setPrefectures(data));
-      dispatch(setPrefecturesById(data));
-    };
-    getMasterData();
-  }, []);
 
   const [nameError, setNameError] = useState<InputError>({
     isError: false,
@@ -79,6 +77,11 @@ const Register = () => {
     errorReason: "",
   });
 
+  useEffect(() => {
+    dispatch(setPrefectures(allPrefectures));
+    dispatch(setHobbies(allHobbies));
+  }, []);
+
   const prefectures = useAppSelector(selectPrefectures);
   const prefecturesSelect = [{ ID: "-1", Name: "未設定" }, ...prefectures];
 
@@ -86,6 +89,22 @@ const Register = () => {
     <MenuItem key={`${prefecture.ID}-${prefecture.Name}`} value={prefecture.ID}>
       {prefecture.Name}
     </MenuItem>
+  ));
+
+  const hobbyItems = useAppSelector(selectedHobbies);
+  const hobbiesCheck = hobbyItems.map((hobby) => (
+    <FormControlLabel
+      key={`${hobby.ID}-${hobby.Name}`}
+      value={hobby.ID}
+      control={
+        <Checkbox
+          onChange={(event) => dispatch(setHobby(event.target.value))}
+        />
+      }
+      label={hobby.Name}
+      labelPlacement="end"
+      checked={hobbies.includes(hobby.ID)}
+    />
   ));
 
   const confirmHandler = (
@@ -311,45 +330,7 @@ const Register = () => {
             <td>
               <FormControl component="fieldset">
                 <FormGroup aria-label="position" row>
-                  <FormControlLabel
-                    value="1"
-                    control={
-                      <Checkbox
-                        onChange={(event) =>
-                          dispatch(setHobby(event.target.value))
-                        }
-                      />
-                    }
-                    label="映画鑑賞"
-                    labelPlacement="end"
-                    checked={hobbies.includes("1")}
-                  />
-                  <FormControlLabel
-                    value="2"
-                    control={
-                      <Checkbox
-                        onChange={(event) =>
-                          dispatch(setHobby(event.target.value))
-                        }
-                      />
-                    }
-                    label="読書"
-                    labelPlacement="end"
-                    checked={hobbies.includes("2")}
-                  />
-                  <FormControlLabel
-                    value="3"
-                    control={
-                      <Checkbox
-                        onChange={(event) =>
-                          dispatch(setHobby(event.target.value))
-                        }
-                      />
-                    }
-                    label="買い物"
-                    labelPlacement="end"
-                    checked={hobbies.includes("3")}
-                  />
+                  {hobbiesCheck}
                 </FormGroup>
               </FormControl>
             </td>
@@ -397,5 +378,18 @@ const Register = () => {
     </>
   );
 };
+
+export async function getStaticProps() {
+  const { data } = await axios.get<MasterDataProps>(
+    "http://backend-app:8080/masterData"
+  );
+
+  return {
+    props: {
+      allPrefectures: data.allPrefectures,
+      allHobbies: data.allHobbies,
+    },
+  };
+}
 
 export default Register;

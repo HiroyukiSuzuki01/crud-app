@@ -10,6 +10,7 @@ import {
   TextField,
   OutlinedInput,
   FormHelperText,
+  Stack,
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import Radio from "@mui/material/Radio";
@@ -18,6 +19,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import IconButton from "@mui/material/IconButton";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
+import Grid from "@mui/material/Unstable_Grid2";
 
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -225,163 +227,176 @@ const Register = (props: MasterDataProps) => {
 
   return (
     <>
-      <table>
-        <tbody>
-          <tr>
-            <td>名前</td>
-            <td>
-              <FormControl error={nameError.isError}>
-                <InputLabel htmlFor="name-input">名前</InputLabel>
-                <OutlinedInput
-                  id="name-input"
-                  label="名前"
-                  value={name}
-                  onChange={(event) => dispatch(setName(event.target.value))}
-                />
-                {nameError.isError && (
-                  <FormHelperText>{nameError.errorReason}</FormHelperText>
-                )}
-              </FormControl>
-            </td>
-          </tr>
-          <tr>
-            <td>年齢</td>
-            <td>
-              <FormControl error={ageError.isError}>
-                <InputLabel htmlFor="age-input">年齢</InputLabel>
-                <OutlinedInput
-                  id="age-input"
-                  label="年齢"
-                  value={age}
-                  type="number"
-                  onChange={(event) => dispatch(setAge(event.target.value))}
-                />
-                {ageError.isError && (
-                  <FormHelperText>{ageError.errorReason}</FormHelperText>
-                )}
-              </FormControl>
-            </td>
-          </tr>
-          <tr>
-            <td>性別</td>
-            <td>
-              <FormControl error={genderError.isError}>
-                <RadioGroup row>
-                  <FormControlLabel
-                    value="1"
-                    control={
-                      <Radio
-                        onChange={(event) =>
-                          dispatch(setGender(event.target.value))
-                        }
-                      />
-                    }
-                    label="男性"
-                    checked={gender === "1"}
-                  />
-                  <FormControlLabel
-                    value="2"
-                    control={
-                      <Radio
-                        onChange={(event) =>
-                          dispatch(setGender(event.target.value))
-                        }
-                      />
-                    }
-                    label="女性"
-                    checked={gender === "2"}
-                  />
-                </RadioGroup>
-                {genderError.isError && (
-                  <FormHelperText>{genderError.errorReason}</FormHelperText>
-                )}
-              </FormControl>
-            </td>
-          </tr>
-          <tr>
-            <td>住所</td>
-            <td>
-              <FormControl error={prefectureError.isError}>
-                <InputLabel id="prefecture-select-label">都道府県</InputLabel>
-                <Select
-                  labelId="prefecture-select-label"
-                  label="都道府県"
-                  value={prefecture}
-                  onChange={(event) =>
-                    dispatch(setPrefecture(event.target.value))
-                  }
-                >
-                  {prefecturesOption}
-                </Select>
-                {prefectureError.isError && (
-                  <FormHelperText>{prefectureError.errorReason}</FormHelperText>
-                )}
-              </FormControl>
-
-              <FormControl error={addressError.isError}>
-                <InputLabel htmlFor="address-input">住所</InputLabel>
-                <OutlinedInput
-                  id="address-input"
-                  label="住所"
-                  value={address}
-                  onChange={(event) => dispatch(setAddress(event.target.value))}
-                />
-                {addressError.isError && (
-                  <FormHelperText>{addressError.errorReason}</FormHelperText>
-                )}
-              </FormControl>
-            </td>
-          </tr>
-          <tr>
-            <td>趣味</td>
-            <td>
-              <FormControl component="fieldset">
-                <FormGroup aria-label="position" row>
-                  {hobbiesCheck}
-                </FormGroup>
-              </FormControl>
-            </td>
-          </tr>
-          <tr>
-            <td>自己紹介</td>
-            <td>
-              <TextField
-                value={selfDescription}
-                label="自己紹介"
-                multiline
-                rows={4}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                onChange={(event) =>
-                  dispatch(setSelfDescription(event.target.value))
-                }
-              />
-            </td>
-          </tr>
-          <tr>
-            <td>写真</td>
-            <td>
-              <IconButton color="primary" aria-label="upload picture">
-                <input hidden accept="/*" type="file" />
-                <PhotoCamera />
-              </IconButton>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <Button type="button" variant="contained" onClick={confirmHandler}>
-        送る
-      </Button>
-      <Button
-        type="button"
-        variant="contained"
-        color="warning"
-        onClick={() => dispatch(reset())}
+      <Grid
+        container
+        direction="column"
+        alignItems="center"
+        justifyContent="center"
       >
-        リセット
-      </Button>
+        <table>
+          <tbody>
+            <tr>
+              <td>名前</td>
+              <td>
+                <FormControl error={nameError.isError}>
+                  <InputLabel htmlFor="name-input">名前</InputLabel>
+                  <OutlinedInput
+                    id="name-input"
+                    label="名前"
+                    value={name}
+                    onChange={(event) => dispatch(setName(event.target.value))}
+                  />
+                  {nameError.isError && (
+                    <FormHelperText>{nameError.errorReason}</FormHelperText>
+                  )}
+                </FormControl>
+              </td>
+            </tr>
+            <tr>
+              <td>年齢</td>
+              <td>
+                <FormControl error={ageError.isError}>
+                  <InputLabel htmlFor="age-input">年齢</InputLabel>
+                  <OutlinedInput
+                    id="age-input"
+                    label="年齢"
+                    value={age}
+                    type="number"
+                    onChange={(event) => dispatch(setAge(event.target.value))}
+                  />
+                  {ageError.isError && (
+                    <FormHelperText>{ageError.errorReason}</FormHelperText>
+                  )}
+                </FormControl>
+              </td>
+            </tr>
+            <tr>
+              <td>性別</td>
+              <td>
+                <FormControl error={genderError.isError}>
+                  <RadioGroup row>
+                    <FormControlLabel
+                      value="1"
+                      control={
+                        <Radio
+                          onChange={(event) =>
+                            dispatch(setGender(event.target.value))
+                          }
+                        />
+                      }
+                      label="男性"
+                      checked={gender === "1"}
+                    />
+                    <FormControlLabel
+                      value="2"
+                      control={
+                        <Radio
+                          onChange={(event) =>
+                            dispatch(setGender(event.target.value))
+                          }
+                        />
+                      }
+                      label="女性"
+                      checked={gender === "2"}
+                    />
+                  </RadioGroup>
+                  {genderError.isError && (
+                    <FormHelperText>{genderError.errorReason}</FormHelperText>
+                  )}
+                </FormControl>
+              </td>
+            </tr>
+            <tr>
+              <td>住所</td>
+              <td>
+                <FormControl error={prefectureError.isError}>
+                  <InputLabel id="prefecture-select-label">都道府県</InputLabel>
+                  <Select
+                    labelId="prefecture-select-label"
+                    label="都道府県"
+                    value={prefecture}
+                    onChange={(event) =>
+                      dispatch(setPrefecture(event.target.value))
+                    }
+                  >
+                    {prefecturesOption}
+                  </Select>
+                  {prefectureError.isError && (
+                    <FormHelperText>
+                      {prefectureError.errorReason}
+                    </FormHelperText>
+                  )}
+                </FormControl>
+
+                <FormControl error={addressError.isError}>
+                  <InputLabel htmlFor="address-input">住所</InputLabel>
+                  <OutlinedInput
+                    id="address-input"
+                    label="住所"
+                    value={address}
+                    onChange={(event) =>
+                      dispatch(setAddress(event.target.value))
+                    }
+                  />
+                  {addressError.isError && (
+                    <FormHelperText>{addressError.errorReason}</FormHelperText>
+                  )}
+                </FormControl>
+              </td>
+            </tr>
+            <tr>
+              <td>趣味</td>
+              <td>
+                <FormControl component="fieldset">
+                  <FormGroup aria-label="position" row>
+                    {hobbiesCheck}
+                  </FormGroup>
+                </FormControl>
+              </td>
+            </tr>
+            <tr>
+              <td>自己紹介</td>
+              <td>
+                <TextField
+                  value={selfDescription}
+                  label="自己紹介"
+                  multiline
+                  rows={4}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  onChange={(event) =>
+                    dispatch(setSelfDescription(event.target.value))
+                  }
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>写真</td>
+              <td>
+                <IconButton color="primary" aria-label="upload picture">
+                  <input hidden accept="/*" type="file" />
+                  <PhotoCamera />
+                </IconButton>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <Stack direction="row" spacing={3}>
+          <Button type="button" variant="contained" onClick={confirmHandler}>
+            送る
+          </Button>
+          <Button
+            type="button"
+            variant="contained"
+            color="warning"
+            onClick={() => dispatch(reset())}
+          >
+            リセット
+          </Button>
+        </Stack>
+      </Grid>
     </>
   );
 };

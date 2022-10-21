@@ -18,7 +18,7 @@ func CreateProfile(r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	var registData models.RegistData
+	var registData models.Profile
 	if err := json.Unmarshal(body, &registData); err != nil {
 		fmt.Println(err)
 	}

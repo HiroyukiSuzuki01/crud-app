@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS crud_app.user_profiles(
 );
 
 CREATE TABLE IF NOT EXISTS crud_app.user_profile_hobby(
-  user_id int auto_increment primary key,
+  user_id int,
   hobby_id int not null,
   created_at datetime,
   updated_at datetime,

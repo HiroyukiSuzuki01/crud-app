@@ -6,8 +6,8 @@ type Master struct {
 	Name string
 }
 
-// RegistData type
-type RegistData struct {
+// Profile type
+type Profile struct {
 	Name            string   `json:"name"`
 	Age             string   `json:"age"`
 	Gender          string   `json:"gender"`

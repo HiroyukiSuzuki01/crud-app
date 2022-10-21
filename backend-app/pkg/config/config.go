@@ -15,7 +15,8 @@ var Db *sql.DB
 
 // DbConnection create sql Connection
 func DbConnection() {
-	err := godotenv.Load(fmt.Sprint("/go/src/app/.env"))
+	var err error
+	err = godotenv.Load(fmt.Sprint("/go/src/app/.env"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -26,8 +27,8 @@ func DbConnection() {
 		Addr:   os.Getenv("DB_ADDR"),
 		DBName: os.Getenv("DB_NAME"),
 	}
-	// var err error
-	Db, err := sql.Open(os.Getenv("DB"), cfg.Clone().FormatDSN())
+
+	Db, err = sql.Open(os.Getenv("DB"), cfg.Clone().FormatDSN())
 	if err != nil {
 		log.Fatal(err)
 	}

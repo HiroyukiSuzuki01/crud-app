@@ -27,7 +27,11 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/masterData", handlers.MasterDataHandler)
-	mux.HandleFunc("/regist", handlers.RegistHandler)
+	mux.HandleFunc("/profile/create", handlers.ProfileCreateHandler)
+	mux.HandleFunc("/profile/update", handlers.UpdateHandler)
+	mux.HandleFunc("/profile/delete", handlers.DeleteHandler)
+	mux.HandleFunc("/profile/search", handlers.SearchHandler)
+	mux.HandleFunc("/profile/", handlers.ReadHandler)
 	handler := cors.Default().Handler(mux)
 	http.ListenAndServe(fmt.Sprintf(":%v", cfg.port), handler)
 }

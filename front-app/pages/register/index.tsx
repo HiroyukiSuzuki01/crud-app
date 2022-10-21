@@ -78,6 +78,7 @@ const Register = (props: MasterDataProps) => {
   });
 
   useEffect(() => {
+    dispatch(reset());
     dispatch(setPrefectures(allPrefectures));
     dispatch(setHobbies(allHobbies));
   }, []);
@@ -113,12 +114,18 @@ const Register = (props: MasterDataProps) => {
     event.preventDefault();
 
     // Validation
+    const nameCheck = inputNameCheck(name);
+    const ageCheck = inputAgeCheck(age);
+    const genderCheck = inputGenderCheck(gender);
+    const prefectureCheck = inputPrefectureCheck(prefecture);
+    const addressCheck = inputAddressCheck(address);
+
     if (
-      !inputNameCheck(name) ||
-      !inputAgeCheck(age) ||
-      !inputGenderCheck(gender) ||
-      !inputPrefectureCheck(prefecture) ||
-      !inputAddressCheck(address)
+      !nameCheck ||
+      !ageCheck ||
+      !genderCheck ||
+      !prefectureCheck ||
+      !addressCheck
     ) {
       return;
     }

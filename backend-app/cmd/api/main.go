@@ -164,9 +164,9 @@ func regist(r *http.Request) {
 	}
 
 	if len(registData.Hobbies) != 0 {
-		for _, hobby := range registData.Hobbies {
+		for _, hobbyID := range registData.Hobbies {
 			_, err := db.Exec("INSERT INTO user_profile_hobby(user_id, hobby_id, created_at, updated_at) VALUES(?, ?, ?, ?)",
-				UserID, hobby, time.Now(), time.Now())
+				UserID, hobbyID, time.Now(), time.Now())
 
 			if err != nil {
 				fmt.Println(err)

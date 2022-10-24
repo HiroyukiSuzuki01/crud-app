@@ -26,12 +26,27 @@ func main() {
 	defer config.Db.Close()
 
 	mux := http.NewServeMux()
+
+	cors := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{
+			http.MethodPost,
+			http.MethodGet,
+			http.MethodPatch,
+			http.MethodPut,
+			http.MethodDelete,
+		},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: false,
+	})
+
 	mux.HandleFunc("/masterData", handlers.MasterDataHandler)
 	mux.HandleFunc("/profile/create", handlers.ProfileCreateHandler)
 	mux.HandleFunc("/profile/update", handlers.UpdateHandler)
 	mux.HandleFunc("/profile/delete", handlers.DeleteHandler)
 	mux.HandleFunc("/profile/search", handlers.SearchHandler)
 	mux.HandleFunc("/profile/", handlers.ReadHandler)
-	handler := cors.Default().Handler(mux)
+
+	handler := cors.Handler(mux)
 	http.ListenAndServe(fmt.Sprintf(":%v", cfg.port), handler)
 }

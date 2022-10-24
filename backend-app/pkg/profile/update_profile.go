@@ -49,6 +49,7 @@ func UpdateProfile(r *http.Request) {
 	}
 	upd.Exec(updateData.Name, updateData.Age, updateData.Gender,
 		updateData.SelfDescription, updateData.Prefecture, updateData.Address, updateData.UserID)
+	defer upd.Close()
 
 	_, err = config.Db.Exec(
 		"DELETE FROM user_profile_hobby WHERE user_id = ?", updateData.UserID)

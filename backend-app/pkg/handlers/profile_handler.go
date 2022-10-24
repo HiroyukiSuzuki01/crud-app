@@ -13,7 +13,7 @@ func ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 // UpdateHandler is to update user_profiles
 func UpdateHandler(w http.ResponseWriter, r *http.Request) {
-	profile.UpdateProfile()
+	profile.UpdateProfile(r)
 	w.WriteHeader(http.StatusOK)
 }
 

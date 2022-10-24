@@ -25,7 +25,7 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 // SearchHandler is to search user_profiles
 func SearchHandler(w http.ResponseWriter, r *http.Request) {
-	profile.SearchProfile()
+	profile.SearchProfile(r)
 	w.WriteHeader(http.StatusOK)
 }
 

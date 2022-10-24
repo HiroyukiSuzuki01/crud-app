@@ -6,14 +6,14 @@ import (
 )
 
 type profile struct {
-	UserID           string `json:"userid"`
-	Name             string `json:"name"`
-	Age              string `json:"age"`
-	Gender           string `json:"gender"`
-	SelefDescription string `json:"selfDescription"`
-	Prefecture       string `json:"prefecture"`
-	Address          string `json:"address"`
-	Hobby            string `json:"hobby"`
+	UserID           string      `json:"userid"`
+	Name             string      `json:"name"`
+	Age              string      `json:"age"`
+	Gender           string      `json:"gender"`
+	SelefDescription string      `json:"selfDescription"`
+	Prefecture       string      `json:"prefecture"`
+	Address          string      `json:"address"`
+	Hobby            interface{} `json:"hobby"`
 }
 
 type showProfile struct {
@@ -61,10 +61,15 @@ func ReadProfile() {
 	for _, v := range profiles {
 		exisProfile, ok := showProfiles[v.UserID]
 		if ok {
-			hobbies := append(exisProfile.Hobbies, v.Hobby)
-			showProfiles[v.UserID].Hobbies = hobbies
+			if v.Hobby != nil {
+				hobbies := append(exisProfile.Hobbies, fmt.Sprintf("%v", v.Hobby))
+				showProfiles[v.UserID].Hobbies = hobbies
+			}
 		} else {
-			hobbies := []string{v.Hobby}
+			hobbies := []string{}
+			if v.Hobby != nil {
+				hobbies = append(hobbies, fmt.Sprintf("%v", v.Hobby))
+			}
 			showProfiles[v.UserID] = &showProfile{
 				UserID:          v.UserID,
 				Name:            v.Name,

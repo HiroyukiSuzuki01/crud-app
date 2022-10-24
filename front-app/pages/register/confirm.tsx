@@ -10,6 +10,8 @@ import {
   selectedHobbiesById,
 } from "../../store/slices/masterDataSlice";
 import { Alert, Backdrop, CircularProgress, Snackbar } from "@mui/material";
+import Grid from "@mui/material/Unstable_Grid2";
+import { Stack } from "@mui/system";
 
 const HOKKAIDO_ID = "1";
 const TOKYO_ID = "13";
@@ -86,45 +88,55 @@ const Confirm = () => {
 
   return (
     <>
-      <table>
-        <tbody>
-          <tr>
-            <td>名前</td>
-            <td>{name}</td>
-          </tr>
-          <tr>
-            <td>年齢</td>
-            <td>{age}</td>
-          </tr>
-          <tr>
-            <td>性別</td>
-            <td>{genderDisplay(gender)}</td>
-          </tr>
-          <tr>
-            <td>住所</td>
-            <td>{createDisplayAddress(prefecture, address)}</td>
-          </tr>
-          <tr>
-            <td>趣味</td>
-            <td>{createDisplayHobbies()}</td>
-          </tr>
-          <tr>
-            <td>自己紹介</td>
-            <td>{selfDescription}</td>
-          </tr>
-        </tbody>
-      </table>
-      <Button type="button" variant="contained" onClick={registHandler}>
-        登録する
-      </Button>
-      <Button
-        type="button"
-        variant="contained"
-        color="warning"
-        onClick={backInputView}
+      <Grid
+        container
+        direction="column"
+        alignItems="center"
+        justifyContent="center"
       >
-        戻る
-      </Button>
+        <table>
+          <tbody>
+            <tr>
+              <td>名前</td>
+              <td>{name}</td>
+            </tr>
+            <tr>
+              <td>年齢</td>
+              <td>{age}</td>
+            </tr>
+            <tr>
+              <td>性別</td>
+              <td>{genderDisplay(gender)}</td>
+            </tr>
+            <tr>
+              <td>住所</td>
+              <td>{createDisplayAddress(prefecture, address)}</td>
+            </tr>
+            <tr>
+              <td>趣味</td>
+              <td>{createDisplayHobbies()}</td>
+            </tr>
+            <tr>
+              <td>自己紹介</td>
+              <td>{selfDescription}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <Stack direction="row" spacing={3}>
+          <Button type="button" variant="contained" onClick={registHandler}>
+            登録する
+          </Button>
+          <Button
+            type="button"
+            variant="contained"
+            color="warning"
+            onClick={backInputView}
+          >
+            戻る
+          </Button>
+        </Stack>
+      </Grid>
 
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}

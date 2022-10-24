@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS crud_app.user_profile_hobby(
   hobby_id int not null,
   created_at datetime,
   updated_at datetime,
-  FOREIGN KEY (user_id) REFERENCES user_profiles(user_id),
+  FOREIGN KEY (user_id) REFERENCES user_profiles(user_id)
+    ON DELETE CASCADE,
   FOREIGN KEY (hobby_id) REFERENCES hobbies(id),
   UNIQUE (user_id, hobby_id)
 );

@@ -62,7 +62,7 @@ const Confirm = () => {
       address,
     };
     // envにurlを寄せたい
-    const url = "http://localhost:8080/regist";
+    const url = "http://localhost:8080/profile/create";
     try {
       await axios.post(url, registData);
     } catch (e) {

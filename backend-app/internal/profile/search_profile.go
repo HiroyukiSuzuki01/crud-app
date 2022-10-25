@@ -1,7 +1,7 @@
 package profile
 
 import (
-	"backend-app/pkg/config"
+	"backend-app/internal/config"
 	"database/sql"
 	"fmt"
 	"net/http"

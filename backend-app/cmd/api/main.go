@@ -1,8 +1,8 @@
 package main
 
 import (
-	"backend-app/pkg/config"
-	"backend-app/pkg/handlers"
+	"backend-app/internal/config"
+	"backend-app/internal/handlers"
 	"flag"
 	"fmt"
 	"net/http"

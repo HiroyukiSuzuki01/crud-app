@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"backend-app/pkg/profile"
+	"backend-app/internal/profile"
 	"net/http"
 )
 

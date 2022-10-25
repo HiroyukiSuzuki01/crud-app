@@ -1,8 +1,8 @@
 package master
 
 import (
-	"backend-app/pkg/config"
-	"backend-app/pkg/models"
+	"backend-app/internal/config"
+	"backend-app/internal/models"
 	"fmt"
 )
 

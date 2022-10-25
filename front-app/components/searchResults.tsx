@@ -17,7 +17,6 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Alert, Backdrop, CircularProgress, Snackbar } from "@mui/material";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
@@ -26,6 +25,8 @@ import {
   searchResult,
 } from "../store/slices/searchProfileSclice";
 import { genderDisplay, prefectureSuffix } from "../utils/createStr";
+import SnackBar from "../UI/snackBar";
+import BackDrop from "../UI/backdrop";
 
 const SearchResults = () => {
   const dispatch = useAppDispatch();
@@ -212,18 +213,13 @@ const SearchResults = () => {
         </DialogActions>
       </Dialog>
 
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={progress}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-
-      <Snackbar open={failed} autoHideDuration={6000} onClose={closeSnackBar}>
-        <Alert onClose={closeSnackBar} severity="error" sx={{ width: "100%" }}>
-          削除に失敗しました
-        </Alert>
-      </Snackbar>
+      <BackDrop progress={progress} />
+      <SnackBar
+        open={failed}
+        close={closeSnackBar}
+        duration={6000}
+        message="削除に失敗しました"
+      />
     </>
   );
 };

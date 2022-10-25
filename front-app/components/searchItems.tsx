@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useState } from "react";
 import {
   MenuItem,
@@ -11,7 +12,6 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Unstable_Grid2";
-import { Alert, Backdrop, CircularProgress, Snackbar } from "@mui/material";
 
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import {
@@ -25,7 +25,8 @@ import {
   setHobbies,
   setProfiles,
 } from "../store/slices/searchProfileSclice";
-import axios from "axios";
+import SnackBar from "../UI/snackBar";
+import BackDrop from "../UI/backdrop";
 
 const SearchItems = () => {
   const dispatch = useAppDispatch();
@@ -119,18 +120,13 @@ const SearchItems = () => {
         </form>
       </Grid>
 
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={progress}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-
-      <Snackbar open={failed} autoHideDuration={6000} onClose={closeSnackBar}>
-        <Alert onClose={closeSnackBar} severity="error" sx={{ width: "100%" }}>
-          データ取得に失敗しました
-        </Alert>
-      </Snackbar>
+      <BackDrop progress={progress} />
+      <SnackBar
+        open={failed}
+        close={closeSnackBar}
+        duration={6000}
+        message="データ取得に失敗しました"
+      />
     </>
   );
 };

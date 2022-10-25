@@ -2,22 +2,23 @@ package profile
 
 import (
 	"backend-app/internal/config"
-	"fmt"
+	"database/sql"
 )
 
 type profile struct {
-	UserID           string      `json:"userid"`
-	Name             string      `json:"name"`
-	Age              string      `json:"age"`
-	Gender           string      `json:"gender"`
-	SelefDescription string      `json:"selfDescription"`
-	Prefecture       string      `json:"prefecture"`
-	Address          string      `json:"address"`
-	Hobby            interface{} `json:"hobby"`
+	UserID           string         `json:"userId"`
+	Name             string         `json:"name"`
+	Age              string         `json:"age"`
+	Gender           string         `json:"gender"`
+	SelefDescription string         `json:"selfDescription"`
+	Prefecture       string         `json:"prefecture"`
+	Address          string         `json:"address"`
+	Hobby            sql.NullString `json:"hobby"`
 }
 
-type showProfile struct {
-	UserID          string   `json:"userid"`
+// ShowProfile Type
+type ShowProfile struct {
+	UserID          string   `json:"userId"`
 	Name            string   `json:"name"`
 	Age             string   `json:"age"`
 	Gender          string   `json:"gender"`
@@ -28,9 +29,10 @@ type showProfile struct {
 }
 
 // ReadProfile is read profile.
-func ReadProfile() {
+func ReadProfile() ([]ShowProfile, error) {
 	var profiles []profile
-	showProfiles := map[string]*showProfile{}
+	var convProfiles []ShowProfile
+	showProfiles := map[string]*ShowProfile{}
 	sqlStr := `
 	    SELECT
 		    user_profiles.user_id,
@@ -46,7 +48,7 @@ func ReadProfile() {
 	`
 	rows, err := config.Db.Query(sqlStr)
 	if err != nil {
-		fmt.Println(err)
+		return convProfiles, err
 	}
 	defer rows.Close()
 
@@ -54,23 +56,23 @@ func ReadProfile() {
 		var profile profile
 		if err := rows.Scan(&profile.UserID, &profile.Name, &profile.Age, &profile.Gender,
 			&profile.SelefDescription, &profile.Prefecture, &profile.Address, &profile.Hobby); err != nil {
-			fmt.Println(err)
+			return convProfiles, err
 		}
 		profiles = append(profiles, profile)
 	}
 	for _, v := range profiles {
 		exisProfile, ok := showProfiles[v.UserID]
 		if ok {
-			if v.Hobby != nil {
-				hobbies := append(exisProfile.Hobbies, fmt.Sprintf("%v", v.Hobby))
+			if v.Hobby.Valid {
+				hobbies := append(exisProfile.Hobbies, v.Hobby.String)
 				showProfiles[v.UserID].Hobbies = hobbies
 			}
 		} else {
 			hobbies := []string{}
-			if v.Hobby != nil {
-				hobbies = append(hobbies, fmt.Sprintf("%v", v.Hobby))
+			if v.Hobby.Valid {
+				hobbies = append(hobbies, v.Hobby.String)
 			}
-			showProfiles[v.UserID] = &showProfile{
+			showProfiles[v.UserID] = &ShowProfile{
 				UserID:          v.UserID,
 				Name:            v.Name,
 				Age:             v.Age,
@@ -82,4 +84,8 @@ func ReadProfile() {
 			}
 		}
 	}
+	for _, v := range showProfiles {
+		convProfiles = append(convProfiles, *v)
+	}
+	return convProfiles, nil
 }

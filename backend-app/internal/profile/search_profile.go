@@ -3,15 +3,15 @@ package profile
 import (
 	"backend-app/internal/config"
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strings"
 )
 
 // SearchProfile is search user_profile.
-func SearchProfile(r *http.Request) {
+func SearchProfile(r *http.Request) ([]ShowProfile, error) {
 	var profiles []profile
-	searchProfiles := map[string]*showProfile{}
+	var convProfiles []ShowProfile
+	searchProfiles := map[string]*ShowProfile{}
 
 	queryStr := `
 		SELECT
@@ -26,9 +26,9 @@ func SearchProfile(r *http.Request) {
 		FROM user_profiles
 		LEFT JOIN user_profile_hobby ON user_profiles.user_id = user_profile_hobby.user_id
 	`
-	name := "test"
+	name := ""
 	prefectureID := "-1"
-	hobbies := []string{"1", "2"}
+	hobbies := []string{}
 	var args []interface{}
 	for _, hobby := range hobbies {
 		args = append(args, hobby)
@@ -69,19 +69,18 @@ func SearchProfile(r *http.Request) {
 				queryStr = queryStr + "WHERE prefecture_id = ?"
 				rows, err = config.Db.Query(queryStr, prefectureID)
 			}
-		} else {
+		} else if len(hobbies) > 0 {
 			// hobbies only
 			queryStr = queryStr + `WHERE hobby_id IN ( ` + repeat + ` )`
 			rows, err = config.Db.Query(queryStr, args...)
 		}
 	}
-	fmt.Println(queryStr)
 
 	if rows == nil {
 		rows, err = config.Db.Query(queryStr)
 	}
 	if err != nil {
-		fmt.Println(err)
+		return convProfiles, nil
 	}
 	defer rows.Close()
 
@@ -89,7 +88,7 @@ func SearchProfile(r *http.Request) {
 		var profile profile
 		if err := rows.Scan(&profile.UserID, &profile.Name, &profile.Age, &profile.Gender,
 			&profile.SelefDescription, &profile.Prefecture, &profile.Address, &profile.Hobby); err != nil {
-			fmt.Println(err)
+			return convProfiles, nil
 		}
 		profiles = append(profiles, profile)
 	}
@@ -97,16 +96,16 @@ func SearchProfile(r *http.Request) {
 	for _, v := range profiles {
 		exisProfile, ok := searchProfiles[v.UserID]
 		if ok {
-			if v.Hobby != nil {
-				hobbies := append(exisProfile.Hobbies, fmt.Sprintf("%v", v.Hobby))
+			if v.Hobby.Valid {
+				hobbies := append(exisProfile.Hobbies, v.Hobby.String)
 				searchProfiles[v.UserID].Hobbies = hobbies
 			}
 		} else {
 			hobbies := []string{}
-			if v.Hobby != nil {
-				hobbies = append(hobbies, fmt.Sprintf("%v", v.Hobby))
+			if v.Hobby.Valid {
+				hobbies = append(hobbies, v.Hobby.String)
 			}
-			searchProfiles[v.UserID] = &showProfile{
+			searchProfiles[v.UserID] = &ShowProfile{
 				UserID:          v.UserID,
 				Name:            v.Name,
 				Age:             v.Age,
@@ -118,4 +117,8 @@ func SearchProfile(r *http.Request) {
 			}
 		}
 	}
+	for _, v := range searchProfiles {
+		convProfiles = append(convProfiles, *v)
+	}
+	return convProfiles, nil
 }

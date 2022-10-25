@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import {
@@ -34,11 +33,8 @@ import {
   reset,
 } from "../../store/slices/registSlice";
 import {
-  Master,
-  setPrefectures,
   selectPrefectures,
   selectedHobbies,
-  setHobbies,
 } from "../../store/slices/masterDataSlice";
 
 interface InputError {
@@ -46,13 +42,7 @@ interface InputError {
   errorReason: string;
 }
 
-interface MasterDataProps {
-  allPrefectures: Master[];
-  allHobbies: Master[];
-}
-
-const Register = (props: MasterDataProps) => {
-  const { allPrefectures, allHobbies } = props;
+const Register = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { name, age, gender, selfDescription, hobbies, prefecture, address } =
@@ -81,8 +71,6 @@ const Register = (props: MasterDataProps) => {
 
   useEffect(() => {
     dispatch(reset());
-    dispatch(setPrefectures(allPrefectures));
-    dispatch(setHobbies(allHobbies));
   }, []);
 
   const prefectures = useAppSelector(selectPrefectures);
@@ -400,18 +388,5 @@ const Register = (props: MasterDataProps) => {
     </>
   );
 };
-
-export async function getStaticProps() {
-  const { data } = await axios.get<MasterDataProps>(
-    "http://backend-app:8080/masterData"
-  );
-
-  return {
-    props: {
-      allPrefectures: data.allPrefectures,
-      allHobbies: data.allHobbies,
-    },
-  };
-}
 
 export default Register;

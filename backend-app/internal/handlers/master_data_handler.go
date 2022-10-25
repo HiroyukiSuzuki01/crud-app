@@ -12,14 +12,14 @@ func MasterDataHandler(w http.ResponseWriter, r *http.Request) {
 	prefectures, err := master.PrefectureAll()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		// w.Write(err)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
 	hobbies, err := master.HobbiesAll()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		// w.Write(err)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
@@ -27,7 +27,7 @@ func MasterDataHandler(w http.ResponseWriter, r *http.Request) {
 	res, err := json.Marshal(masterData)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		// w.Write(err)
+		w.Write([]byte(err.Error()))
 		return
 	}
 

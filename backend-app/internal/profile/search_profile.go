@@ -3,6 +3,7 @@ package profile
 import (
 	"backend-app/internal/config"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -10,8 +11,11 @@ import (
 // SearchProfile is search user_profile.
 func SearchProfile(r *http.Request) ([]ShowProfile, error) {
 	var profiles []profile
-	var convProfiles []ShowProfile
+	convProfiles := []ShowProfile{}
 	searchProfiles := map[string]*ShowProfile{}
+	name := r.URL.Query().Get("name")
+	prefID := r.URL.Query().Get("prefID")
+	hobbies := r.URL.Query().Get("hobbies")
 
 	queryStr := `
 		SELECT
@@ -26,9 +30,7 @@ func SearchProfile(r *http.Request) ([]ShowProfile, error) {
 		FROM user_profiles
 		LEFT JOIN user_profile_hobby ON user_profiles.user_id = user_profile_hobby.user_id
 	`
-	name := ""
-	prefectureID := "-1"
-	hobbies := []string{}
+	// hobbies := []string{}
 	var args []interface{}
 	for _, hobby := range hobbies {
 		args = append(args, hobby)
@@ -41,33 +43,34 @@ func SearchProfile(r *http.Request) ([]ShowProfile, error) {
 	var rows *sql.Rows
 	var err error
 	if len(name) > 0 {
-		if prefectureID == "-1" && len(hobbies) == 0 {
+		if prefID == "-1" && len(hobbies) == 0 {
 			// name only
 			queryStr = queryStr + "WHERE name LIKE CONCAT('%', ?, '%')"
 			rows, err = config.Db.Query(queryStr, name)
-		} else if prefectureID != "-1" && len(hobbies) == 0 {
+		} else if prefID != "-1" && len(hobbies) == 0 {
 			// name & prefecture
 			queryStr = queryStr + "WHERE name LIKE CONCAT('%', ?, '%')" + " AND prefecture_id = ?"
-			rows, err = config.Db.Query(queryStr, name, prefectureID)
-		} else if prefectureID == "-1" && len(hobbies) > 0 {
+			rows, err = config.Db.Query(queryStr, name, prefID)
+		} else if prefID == "-1" && len(hobbies) > 0 {
 			// name & hobby
 			queryStr = queryStr + "WHERE name LIKE CONCAT('%', ?, '%')" + ` AND hobby_id IN ( ` + repeat + ` )`
 			rows, err = config.Db.Query(queryStr, name, hobbies)
 		} else {
 			// name & prefecture & hobby
 			queryStr = queryStr + "WHERE name LIKE CONCAT('%', ?, '%')" + " AND prefecture_id = ?" + ` AND hobby_id IN ( ` + repeat + ` )`
-			rows, err = config.Db.Query(queryStr, name, prefectureID, hobbies)
+			rows, err = config.Db.Query(queryStr, name, prefID, hobbies)
 		}
 	} else {
-		if prefectureID != "-1" {
+		if prefID != "-1" {
 			if len(hobbies) > 0 {
 				// prefecutre & hobbies
 				queryStr = queryStr + "WHERE prefecture_id = ?" + ` AND hobby_id IN ( ` + repeat + ` )`
-				rows, err = config.Db.Query(queryStr, prefectureID, args)
+				rows, err = config.Db.Query(queryStr, prefID, args)
 			} else {
 				// prefecture only
+				fmt.Println("fjijfie")
 				queryStr = queryStr + "WHERE prefecture_id = ?"
-				rows, err = config.Db.Query(queryStr, prefectureID)
+				rows, err = config.Db.Query(queryStr, prefID)
 			}
 		} else if len(hobbies) > 0 {
 			// hobbies only
@@ -82,6 +85,7 @@ func SearchProfile(r *http.Request) ([]ShowProfile, error) {
 	if err != nil {
 		return convProfiles, nil
 	}
+	fmt.Println(queryStr)
 	defer rows.Close()
 
 	for rows.Next() {

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   MenuItem,
   Select,
@@ -10,19 +11,28 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Unstable_Grid2";
-import { useState } from "react";
+import { Alert, Backdrop, CircularProgress, Snackbar } from "@mui/material";
 
-import { useAppSelector } from "../store/hooks";
+import { useAppSelector, useAppDispatch } from "../store/hooks";
 import {
   selectPrefectures,
   selectedHobbies,
 } from "../store/slices/masterDataSlice";
+import {
+  searchResult,
+  setName,
+  setPref,
+  setHobbies,
+  setProfiles,
+} from "../store/slices/searchProfileSclice";
 import axios from "axios";
 
 const SearchItems = () => {
-  const [prefecture, setPrefecture] = useState("-1");
-  const [name, setName] = useState("");
-  const [hobbies, setHobbies] = useState<string[]>([]);
+  const dispatch = useAppDispatch();
+  const { searchName, searchPref, searchHobbies } =
+    useAppSelector(searchResult);
+  const [failed, setFailed] = useState(false);
+  const [progress, setProgress] = useState(false);
 
   const prefectures = useAppSelector(selectPrefectures);
   const prefecturesSelect = [{ ID: "-1", Name: "未設定" }, ...prefectures];
@@ -40,27 +50,38 @@ const SearchItems = () => {
       value={hobby.ID}
       control={
         <Checkbox
-          onChange={(event) => selectedHobbyHandler(event.target.value)}
+          onChange={(event) => dispatch(setHobbies(event.target.value))}
         />
       }
       label={hobby.Name}
       labelPlacement="end"
-      checked={hobbies.includes(hobby.ID)}
+      checked={searchHobbies.includes(hobby.ID)}
     />
   ));
-
-  const selectedHobbyHandler = (hobby: string) => {
-    if (hobbies.includes(hobby)) {
-      setHobbies(hobbies.filter((v) => hobby !== v));
-    } else {
-      setHobbies([...hobbies, hobby]);
-    }
-  };
 
   const onSubmitHandler = async (event: any) => {
     event.preventDefault();
     const url = "http://localhost:8080/profile/search";
-    const { data } = await axios.get(url);
+    try {
+      setProgress(true);
+      const { data } = await axios.get(url, {
+        params: {
+          name: searchName,
+          prefID: searchPref,
+          hobbies: searchHobbies,
+        },
+      });
+      dispatch(setProfiles(data));
+      setProgress(false);
+    } catch (e) {
+      console.error(e);
+      setProgress(false);
+      setFailed(true);
+    }
+  };
+
+  const closeSnackBar = () => {
+    setFailed(false);
   };
 
   return (
@@ -72,8 +93,8 @@ const SearchItems = () => {
             <OutlinedInput
               id="name-input"
               label="名前"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
+              value={searchName}
+              onChange={(event) => dispatch(setName(event.target.value))}
             />
           </FormControl>
           <FormControl>
@@ -81,8 +102,8 @@ const SearchItems = () => {
             <Select
               labelId="prefecture-select-label"
               label="都道府県"
-              value={prefecture}
-              onChange={(event) => setPrefecture(event.target.value)}
+              value={searchPref}
+              onChange={(event) => dispatch(setPref(event.target.value))}
             >
               {prefecturesOption}
             </Select>
@@ -97,6 +118,19 @@ const SearchItems = () => {
           </Button>
         </form>
       </Grid>
+
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={progress}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
+      <Snackbar open={failed} autoHideDuration={6000} onClose={closeSnackBar}>
+        <Alert onClose={closeSnackBar} severity="error" sx={{ width: "100%" }}>
+          データ取得に失敗しました
+        </Alert>
+      </Snackbar>
     </>
   );
 };

@@ -1,7 +1,6 @@
 package profile
 
 import (
-	"backend-app/internal/config"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -24,11 +23,11 @@ func DeleteProfile(r *http.Request) error {
 		return err
 	}
 
-	_, err = config.Db.Exec(
-		"DELETE FROM user_profiles where user_id = ?", deleteID.UserID)
+	// _, err = config.Db.Exec(
+	// 	"DELETE FROM user_profiles where user_id = ?", deleteID.UserID)
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 	return nil
 }

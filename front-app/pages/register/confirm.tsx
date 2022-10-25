@@ -12,7 +12,6 @@ import {
 import { Alert, Backdrop, CircularProgress, Snackbar } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { Stack } from "@mui/system";
-// import { genderDisplay, prefectureSuffix } from "../../utils/createStr";
 
 const HOKKAIDO_ID = "1";
 const TOKYO_ID = "13";

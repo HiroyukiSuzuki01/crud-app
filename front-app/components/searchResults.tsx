@@ -17,15 +17,24 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { Alert, Backdrop, CircularProgress, Snackbar } from "@mui/material";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { profileResult, setProfiles } from "../store/slices/profileSclice";
+import {
+  profileResult,
+  setProfiles,
+  searchResult,
+} from "../store/slices/searchProfileSclice";
 import { genderDisplay, prefectureSuffix } from "../utils/createStr";
 
 const SearchResults = () => {
   const dispatch = useAppDispatch();
-  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const { searchName, searchPref, searchHobbies } =
+    useAppSelector(searchResult);
   const [deleteUser, setDeleteUser] = useState({ userId: "", userName: "" });
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [progress, setProgress] = useState(false);
 
   useEffect(() => {
     const getProfiles = async () => {
@@ -42,17 +51,33 @@ const SearchResults = () => {
     confirmOpen();
   };
 
+  const closeSnackBar = () => {
+    setFailed(false);
+  };
+
   const deleteHandler = async () => {
     const url = "http://localhost:8080/profile/delete";
-    const data = {
+    const deleteData = {
       userId: deleteUser.userId,
     };
     try {
-      const res = await axios.delete(url, { data });
-      console.log(res);
-    } catch (e) {
-      console.log(e);
+      await axios.delete(url, { data: deleteData });
       confirmClose();
+      setProgress(true);
+
+      const getUrl = "http://localhost:8080/profile/search";
+      const res = await axios.get(getUrl, {
+        params: {
+          name: searchName,
+          prefID: searchPref,
+          hobbies: searchHobbies,
+        },
+      });
+      dispatch(setProfiles(res.data));
+      setProgress(false);
+    } catch (e) {
+      confirmClose();
+      setFailed(true);
     }
   };
 
@@ -186,6 +211,19 @@ const SearchResults = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={progress}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
+      <Snackbar open={failed} autoHideDuration={6000} onClose={closeSnackBar}>
+        <Alert onClose={closeSnackBar} severity="error" sx={{ width: "100%" }}>
+          削除に失敗しました
+        </Alert>
+      </Snackbar>
     </>
   );
 };

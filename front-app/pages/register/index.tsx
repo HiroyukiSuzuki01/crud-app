@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import {
@@ -33,9 +34,12 @@ import {
   reset,
 } from "../../store/slices/registSlice";
 import {
+  setPrefectures,
+  setHobbies,
   selectPrefectures,
   selectedHobbies,
 } from "../../store/slices/masterDataSlice";
+import { MasterDataProps } from "../../models/masterDataModel";
 
 interface InputError {
   isError: boolean;
@@ -45,8 +49,16 @@ interface InputError {
 const Register = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { name, age, gender, selfDescription, hobbies, prefecture, address } =
-    useAppSelector(selectRegist);
+  const {
+    userId,
+    name,
+    age,
+    gender,
+    selfDescription,
+    hobbies,
+    prefecture,
+    address,
+  } = useAppSelector(selectRegist);
 
   const [nameError, setNameError] = useState<InputError>({
     isError: false,
@@ -70,7 +82,16 @@ const Register = () => {
   });
 
   useEffect(() => {
-    dispatch(reset());
+    // dispatch(reset());
+    const getMaster = async () => {
+      const url = "http://localhost:8080/masterData";
+      const { data } = await axios.get<MasterDataProps>(url);
+      dispatch(setPrefectures(data.allPrefectures));
+      dispatch(setHobbies(data.allHobbies));
+    };
+    if (!userId) {
+      getMaster();
+    }
   }, []);
 
   const prefectures = useAppSelector(selectPrefectures);
@@ -119,7 +140,6 @@ const Register = () => {
     ) {
       return;
     }
-
     router.replace("/register/confirm");
   };
 

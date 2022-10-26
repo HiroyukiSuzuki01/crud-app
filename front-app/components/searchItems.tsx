@@ -18,20 +18,21 @@ import {
   selectPrefectures,
   selectedHobbies,
 } from "../store/slices/masterDataSlice";
+import { setProfiles } from "../store/slices/profileSclice";
 import {
-  searchResult,
-  setName,
-  setPref,
-  setHobbies,
-  setProfiles,
-} from "../store/slices/searchProfileSclice";
+  selectSearch,
+  setSearchName,
+  setSearchPref,
+  setSearchHobbies,
+} from "../store/slices/searchSlice";
+import { Profile } from "../models/profileModel";
 import SnackBar from "../UI/snackBar";
 import BackDrop from "../UI/backdrop";
 
 const SearchItems = () => {
   const dispatch = useAppDispatch();
   const { searchName, searchPref, searchHobbies } =
-    useAppSelector(searchResult);
+    useAppSelector(selectSearch);
   const [failed, setFailed] = useState(false);
   const [progress, setProgress] = useState(false);
 
@@ -51,7 +52,7 @@ const SearchItems = () => {
       value={hobby.ID}
       control={
         <Checkbox
-          onChange={(event) => dispatch(setHobbies(event.target.value))}
+          onChange={(event) => dispatch(setSearchHobbies(event.target.value))}
         />
       }
       label={hobby.Name}
@@ -60,12 +61,12 @@ const SearchItems = () => {
     />
   ));
 
-  const onSubmitHandler = async (event: any) => {
+  const onSubmitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const url = "http://localhost:8080/profile/search";
     try {
       setProgress(true);
-      const { data } = await axios.get(url, {
+      const { data } = await axios.get<Profile[]>(url, {
         params: {
           name: searchName,
           prefID: searchPref,
@@ -95,7 +96,7 @@ const SearchItems = () => {
               id="name-input"
               label="名前"
               value={searchName}
-              onChange={(event) => dispatch(setName(event.target.value))}
+              onChange={(event) => dispatch(setSearchName(event.target.value))}
             />
           </FormControl>
           <FormControl>
@@ -104,7 +105,7 @@ const SearchItems = () => {
               labelId="prefecture-select-label"
               label="都道府県"
               value={searchPref}
-              onChange={(event) => dispatch(setPref(event.target.value))}
+              onChange={(event) => dispatch(setSearchPref(event.target.value))}
             >
               {prefecturesOption}
             </Select>

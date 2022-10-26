@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import TableContainer from "@mui/material/TableContainer";
 import Button from "@mui/material/Button";
 import Table from "@mui/material/Table";
@@ -19,19 +20,19 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import {
-  profileResult,
-  setProfiles,
-  searchResult,
-} from "../store/slices/searchProfileSclice";
+import { profileResult, setProfiles } from "../store/slices/profileSclice";
+import { setUpdateProfile } from "../store/slices/registSlice";
+import { selectSearch } from "../store/slices/searchSlice";
 import { genderDisplay, prefectureSuffix } from "../utils/createStr";
+import { Profile } from "../models/profileModel";
 import SnackBar from "../UI/snackBar";
 import BackDrop from "../UI/backdrop";
 
 const SearchResults = () => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { searchName, searchPref, searchHobbies } =
-    useAppSelector(searchResult);
+    useAppSelector(selectSearch);
   const [deleteUser, setDeleteUser] = useState({ userId: "", userName: "" });
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -67,14 +68,14 @@ const SearchResults = () => {
       setProgress(true);
 
       const getUrl = "http://localhost:8080/profile/search";
-      const res = await axios.get(getUrl, {
+      const { data } = await axios.get<Profile[]>(getUrl, {
         params: {
           name: searchName,
           prefID: searchPref,
           hobbies: searchHobbies,
         },
       });
-      dispatch(setProfiles(res.data));
+      dispatch(setProfiles(data));
       setProgress(false);
     } catch (e) {
       confirmClose();
@@ -89,6 +90,14 @@ const SearchResults = () => {
   const confirmClose = () => {
     setDeleteUser({ ...deleteUser, userId: "", userName: "" });
     setDeleteConfirm(false);
+  };
+
+  const updateHandler = (userId: string) => {
+    const updateUser = profiles.find(
+      (profile) => profile.userId === userId
+    ) as Profile;
+    dispatch(setUpdateProfile(updateUser));
+    router.push("/register");
   };
 
   // check
@@ -164,7 +173,7 @@ const SearchResults = () => {
                   />
                 </TableCell>
                 <TableCell component="th" align="right">
-                  <EditIcon />
+                  <EditIcon onClick={() => updateHandler(profile.userId)} />
                 </TableCell>
               </TableRow>
             ))}

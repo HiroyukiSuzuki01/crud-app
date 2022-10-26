@@ -1,17 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
+import { Profile } from "../../models/profileModel";
 
-export type RegistState = {
-  name: string;
-  age: string;
-  selfDescription: string;
-  gender: string;
-  hobbies: string[];
-  prefecture: string;
-  address: string;
-};
-
-const initialState: RegistState = {
+const initialState: Profile = {
+  userId: "",
   name: "",
   age: "",
   gender: "",
@@ -67,6 +59,16 @@ export const registSlice = createSlice({
       state.prefecture = "-1";
       state.address = "";
     },
+    setUpdateProfile: (state, action: PayloadAction<Profile>) => {
+      state.userId = action.payload.userId;
+      state.name = action.payload.name;
+      state.age = action.payload.age;
+      state.gender = action.payload.gender;
+      state.selfDescription = action.payload.selfDescription;
+      state.hobbies = action.payload.hobbies;
+      state.prefecture = action.payload.prefecture;
+      state.address = action.payload.address;
+    },
   },
 });
 
@@ -79,6 +81,7 @@ export const {
   setPrefecture,
   setAddress,
   reset,
+  setUpdateProfile,
 } = registSlice.actions;
 
 export const selectRegist = (state: RootState) => state.regist;

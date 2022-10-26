@@ -9,9 +9,10 @@ import {
   selectPrefecturesById,
   selectedHobbiesById,
 } from "../../store/slices/masterDataSlice";
-import { Alert, Backdrop, CircularProgress, Snackbar } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { Stack } from "@mui/system";
+import BackDrop from "../../UI/backdrop";
+import SnackBar from "../../UI/snackBar";
 
 const HOKKAIDO_ID = "1";
 const TOKYO_ID = "13";
@@ -66,7 +67,8 @@ const Confirm = () => {
     // envにurlを寄せたい
     const url = "http://localhost:8080/profile/create";
     try {
-      await axios.post(url, registData);
+      // await axios.post(url, registData);
+      router.replace("/register/complete");
     } catch (e) {
       console.error(e);
       setProgress(false);
@@ -138,18 +140,13 @@ const Confirm = () => {
         </Stack>
       </Grid>
 
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={progress}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-
-      <Snackbar open={failed} autoHideDuration={6000} onClose={closeSnackBar}>
-        <Alert onClose={closeSnackBar} severity="error" sx={{ width: "100%" }}>
-          登録に失敗しました
-        </Alert>
-      </Snackbar>
+      <BackDrop progress={progress} />
+      <SnackBar
+        open={failed}
+        close={closeSnackBar}
+        duration={6000}
+        message="登録に失敗しました"
+      />
     </>
   );
 };

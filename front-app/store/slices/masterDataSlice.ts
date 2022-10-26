@@ -1,21 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
-
-export type Master = {
-  ID: string;
-  Name: string;
-};
-
-export type MasterById = {
-  [ID: string]: Master;
-};
-
-export type MasterDataState = {
-  prefectures: Master[];
-  prefecturesById: MasterById;
-  hobbies: Master[];
-  hobbiesById: MasterById;
-};
+import {
+  Master,
+  MasterById,
+  MasterDataState,
+} from "../../models/masterDataModel";
 
 const initialState: MasterDataState = {
   prefectures: [],

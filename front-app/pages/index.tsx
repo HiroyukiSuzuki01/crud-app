@@ -4,16 +4,8 @@ import { useEffect } from "react";
 import SearchItems from "../components/searchItems";
 import SearchResults from "../components/searchResults";
 import { useAppDispatch } from "../store/hooks";
-import {
-  Master,
-  setPrefectures,
-  setHobbies,
-} from "../store/slices/masterDataSlice";
-
-interface MasterDataProps {
-  allPrefectures: Master[];
-  allHobbies: Master[];
-}
+import { setPrefectures, setHobbies } from "../store/slices/masterDataSlice";
+import { MasterDataProps } from "../models/masterDataModel";
 
 const Search = (props: MasterDataProps) => {
   const { allPrefectures, allHobbies } = props;

@@ -2,7 +2,6 @@ package main
 
 import (
 	"backend-app/internal/config"
-	"backend-app/internal/handlers"
 	"flag"
 	"fmt"
 	"net/http"
@@ -25,8 +24,6 @@ func main() {
 	config.DbConnection()
 	defer config.Db.Close()
 
-	mux := http.NewServeMux()
-
 	cors := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{
@@ -40,13 +37,8 @@ func main() {
 		AllowCredentials: false,
 	})
 
-	mux.HandleFunc("/masterData", handlers.MasterDataHandler)
-	mux.HandleFunc("/profile/create", handlers.ProfileCreateHandler)
-	mux.HandleFunc("/profile/update", handlers.UpdateHandler)
-	mux.HandleFunc("/profile/delete", handlers.DeleteHandler)
-	mux.HandleFunc("/profile/search", handlers.SearchHandler)
-	mux.HandleFunc("/profile/", handlers.ReadHandler)
-
+	mux := routes()
 	handler := cors.Handler(mux)
+
 	http.ListenAndServe(fmt.Sprintf(":%v", cfg.port), handler)
 }

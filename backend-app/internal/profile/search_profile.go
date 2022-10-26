@@ -2,6 +2,7 @@ package profile
 
 import (
 	"backend-app/internal/config"
+	"backend-app/internal/models"
 	"database/sql"
 	"fmt"
 	"net/http"
@@ -9,10 +10,11 @@ import (
 )
 
 // SearchProfile is search user_profile.
-func SearchProfile(r *http.Request) ([]ShowProfile, error) {
-	var profiles []profile
-	convProfiles := []ShowProfile{}
-	searchProfiles := map[string]*ShowProfile{}
+func SearchProfile(r *http.Request) ([]models.Profile, error) {
+	var reaadProfiles []models.ReqdProfile
+	profiles := []models.Profile{}
+	profilesByID := map[string]*models.Profile{}
+
 	name := r.URL.Query().Get("name")
 	prefID := r.URL.Query().Get("prefID")
 	hobbies := r.URL.Query().Get("hobbies")
@@ -83,33 +85,33 @@ func SearchProfile(r *http.Request) ([]ShowProfile, error) {
 		rows, err = config.Db.Query(queryStr)
 	}
 	if err != nil {
-		return convProfiles, nil
+		return profiles, nil
 	}
 	fmt.Println(queryStr)
 	defer rows.Close()
 
 	for rows.Next() {
-		var profile profile
+		var profile models.ReqdProfile
 		if err := rows.Scan(&profile.UserID, &profile.Name, &profile.Age, &profile.Gender,
 			&profile.SelefDescription, &profile.Prefecture, &profile.Address, &profile.Hobby); err != nil {
-			return convProfiles, nil
+			return profiles, nil
 		}
-		profiles = append(profiles, profile)
+		reaadProfiles = append(reaadProfiles, profile)
 	}
 
-	for _, v := range profiles {
-		exisProfile, ok := searchProfiles[v.UserID]
+	for _, v := range reaadProfiles {
+		exisProfile, ok := profilesByID[v.UserID]
 		if ok {
 			if v.Hobby.Valid {
 				hobbies := append(exisProfile.Hobbies, v.Hobby.String)
-				searchProfiles[v.UserID].Hobbies = hobbies
+				profilesByID[v.UserID].Hobbies = hobbies
 			}
 		} else {
 			hobbies := []string{}
 			if v.Hobby.Valid {
 				hobbies = append(hobbies, v.Hobby.String)
 			}
-			searchProfiles[v.UserID] = &ShowProfile{
+			profilesByID[v.UserID] = &models.Profile{
 				UserID:          v.UserID,
 				Name:            v.Name,
 				Age:             v.Age,
@@ -121,8 +123,8 @@ func SearchProfile(r *http.Request) ([]ShowProfile, error) {
 			}
 		}
 	}
-	for _, v := range searchProfiles {
-		convProfiles = append(convProfiles, *v)
+	for _, v := range profilesByID {
+		profiles = append(profiles, *v)
 	}
-	return convProfiles, nil
+	return profiles, nil
 }

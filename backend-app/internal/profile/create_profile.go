@@ -2,12 +2,21 @@ package profile
 
 import (
 	"backend-app/internal/config"
-	"backend-app/internal/models"
 	"encoding/json"
 	"io"
 	"net/http"
 	"time"
 )
+
+type createProfile struct {
+	Name            string   `json:"name"`
+	Age             string   `json:"age"`
+	Gender          string   `json:"gender"`
+	SelfDescription string   `json:"selfDescription"`
+	Hobbies         []string `json:"hobbies"`
+	Prefecture      string   `json:"prefecture"`
+	Address         string   `json:"address"`
+}
 
 // CreateProfile is insert user_profile.
 func CreateProfile(r *http.Request) error {
@@ -17,7 +26,7 @@ func CreateProfile(r *http.Request) error {
 	}
 	defer r.Body.Close()
 
-	var registData models.Profile
+	var registData createProfile
 	if err := json.Unmarshal(body, &registData); err != nil {
 		return err
 	}

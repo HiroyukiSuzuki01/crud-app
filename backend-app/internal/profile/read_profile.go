@@ -2,37 +2,15 @@ package profile
 
 import (
 	"backend-app/internal/config"
-	"database/sql"
+	"backend-app/internal/models"
 )
 
-type profile struct {
-	UserID           string         `json:"userId"`
-	Name             string         `json:"name"`
-	Age              string         `json:"age"`
-	Gender           string         `json:"gender"`
-	SelefDescription string         `json:"selfDescription"`
-	Prefecture       string         `json:"prefecture"`
-	Address          string         `json:"address"`
-	Hobby            sql.NullString `json:"hobby"`
-}
-
-// ShowProfile Type
-type ShowProfile struct {
-	UserID          string   `json:"userId"`
-	Name            string   `json:"name"`
-	Age             string   `json:"age"`
-	Gender          string   `json:"gender"`
-	SelfDescription string   `json:"selfDescription"`
-	Hobbies         []string `json:"hobbies"`
-	Prefecture      string   `json:"prefecture"`
-	Address         string   `json:"address"`
-}
-
 // ReadProfile is read profile.
-func ReadProfile() ([]ShowProfile, error) {
-	var profiles []profile
-	var convProfiles []ShowProfile
-	showProfiles := map[string]*ShowProfile{}
+func ReadProfile() ([]models.Profile, error) {
+	var readProfiles []models.ReqdProfile
+	var profiles []models.Profile
+	profilesByID := map[string]*models.Profile{}
+
 	sqlStr := `
 	    SELECT
 		    user_profiles.user_id,
@@ -48,31 +26,31 @@ func ReadProfile() ([]ShowProfile, error) {
 	`
 	rows, err := config.Db.Query(sqlStr)
 	if err != nil {
-		return convProfiles, err
+		return profiles, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var profile profile
+		var profile models.ReqdProfile
 		if err := rows.Scan(&profile.UserID, &profile.Name, &profile.Age, &profile.Gender,
 			&profile.SelefDescription, &profile.Prefecture, &profile.Address, &profile.Hobby); err != nil {
-			return convProfiles, err
+			return profiles, err
 		}
-		profiles = append(profiles, profile)
+		readProfiles = append(readProfiles, profile)
 	}
-	for _, v := range profiles {
-		exisProfile, ok := showProfiles[v.UserID]
+	for _, v := range readProfiles {
+		exisProfile, ok := profilesByID[v.UserID]
 		if ok {
 			if v.Hobby.Valid {
 				hobbies := append(exisProfile.Hobbies, v.Hobby.String)
-				showProfiles[v.UserID].Hobbies = hobbies
+				profilesByID[v.UserID].Hobbies = hobbies
 			}
 		} else {
 			hobbies := []string{}
 			if v.Hobby.Valid {
 				hobbies = append(hobbies, v.Hobby.String)
 			}
-			showProfiles[v.UserID] = &ShowProfile{
+			profilesByID[v.UserID] = &models.Profile{
 				UserID:          v.UserID,
 				Name:            v.Name,
 				Age:             v.Age,
@@ -84,8 +62,8 @@ func ReadProfile() ([]ShowProfile, error) {
 			}
 		}
 	}
-	for _, v := range showProfiles {
-		convProfiles = append(convProfiles, *v)
+	for _, v := range profilesByID {
+		profiles = append(profiles, *v)
 	}
-	return convProfiles, nil
+	return profiles, nil
 }

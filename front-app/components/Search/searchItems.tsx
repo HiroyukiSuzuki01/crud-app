@@ -13,19 +13,19 @@ import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Unstable_Grid2";
 
-import { useAppSelector, useAppDispatch } from "../store/hooks";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import {
   selectPrefectures,
   selectedHobbies,
-} from "../store/slices/masterDataSlice";
-import { setProfiles } from "../store/slices/profileSclice";
+} from "../../store/slices/masterDataSlice";
+import { setProfiles } from "../../store/slices/profileSclice";
 import {
   selectSearch,
   setSearchName,
   setSearchPref,
   setSearchHobbies,
-} from "../store/slices/searchSlice";
-import { Profile } from "../models/profileModel";
+} from "../../store/slices/searchSlice";
+import { Profile } from "../../models/profileModel";
 import SnackBar from "../UI/snackBar";
 import BackDrop from "../UI/backdrop";
 

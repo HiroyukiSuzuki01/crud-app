@@ -1,8 +1,8 @@
 import axios from "axios";
 import { useEffect } from "react";
 
-import SearchItems from "../components/searchItems";
-import SearchResults from "../components/searchResults";
+import SearchItems from "../components/Search/searchItems";
+import SearchResults from "../components/Search/searchResults";
 import { useAppDispatch } from "../store/hooks";
 import { setPrefectures, setHobbies } from "../store/slices/masterDataSlice";
 import { MasterDataProps } from "../models/masterDataModel";

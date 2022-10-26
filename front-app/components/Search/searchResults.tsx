@@ -2,7 +2,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import TableContainer from "@mui/material/TableContainer";
-import Button from "@mui/material/Button";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableRow from "@mui/material/TableRow";
@@ -13,20 +12,24 @@ import TablePagination from "@mui/material/TablePagination";
 import Paper from "@mui/material/Paper";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { profileResult, setProfiles } from "../store/slices/profileSclice";
-import { setUpdateProfile } from "../store/slices/registSlice";
-import { selectSearch } from "../store/slices/searchSlice";
-import { genderDisplay, prefectureSuffix } from "../utils/createStr";
-import { Profile } from "../models/profileModel";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { profileResult, setProfiles } from "../../store/slices/profileSclice";
+import { setUpdateProfile } from "../../store/slices/registSlice";
+import { selectSearch } from "../../store/slices/searchSlice";
+import {
+  selectPrefecturesById,
+  selectedHobbiesById,
+} from "../../store/slices/masterDataSlice";
+import {
+  createGenderStr,
+  createPrefStr,
+  createDisplayHobbies,
+} from "../../utils/createStr";
+import { Profile } from "../../models/profileModel";
 import SnackBar from "../UI/snackBar";
 import BackDrop from "../UI/backdrop";
+import CustomDialog from "../UI/customDialog";
 
 const SearchResults = () => {
   const router = useRouter();
@@ -47,6 +50,8 @@ const SearchResults = () => {
     getProfiles();
   }, []);
   const profiles = useAppSelector(profileResult);
+  const prefecturesById = useAppSelector(selectPrefecturesById);
+  const hobbiesById = useAppSelector(selectedHobbiesById);
 
   const deleteConfim = (userId: string, userName: string) => {
     setDeleteUser({ ...deleteUser, userId, userName });
@@ -159,13 +164,13 @@ const SearchResults = () => {
                   {profile.selfDescription}
                 </TableCell>
                 <TableCell component="th" align="right">
-                  {genderDisplay(profile.gender)}
+                  {createGenderStr(profile.gender)}
                 </TableCell>
                 <TableCell component="th" align="right">
-                  {profile.userId}
+                  {createDisplayHobbies(profile.hobbies, hobbiesById)}
                 </TableCell>
                 <TableCell component="th" align="right">
-                  {prefectureSuffix(profile.prefecture)}
+                  {createPrefStr(profile.prefecture, prefecturesById)}
                 </TableCell>
                 <TableCell component="th" align="right">
                   <DeleteIcon
@@ -203,24 +208,14 @@ const SearchResults = () => {
         </Table>
       </TableContainer>
 
-      <Dialog
+      <CustomDialog
         open={deleteConfirm}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">削除確認</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {`${deleteUser.userName}さんを削除します。よろしいですか?`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={confirmClose}>キャンセル</Button>
-          <Button onClick={deleteHandler} autoFocus>
-            削除
-          </Button>
-        </DialogActions>
-      </Dialog>
+        title="削除確認"
+        message={`${deleteUser.userName}さんを削除します。よろしいですか?`}
+        cancel={confirmClose}
+        exec={deleteHandler}
+        action="削除"
+      />
 
       <BackDrop progress={progress} />
       <SnackBar

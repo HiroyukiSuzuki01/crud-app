@@ -11,12 +11,13 @@ import {
 } from "../../store/slices/masterDataSlice";
 import Grid from "@mui/material/Unstable_Grid2";
 import { Stack } from "@mui/system";
-import BackDrop from "../../UI/backdrop";
-import SnackBar from "../../UI/snackBar";
-
-const HOKKAIDO_ID = "1";
-const TOKYO_ID = "13";
-const PREF_ARR = ["26", "27"];
+import BackDrop from "../../components/UI/backdrop";
+import SnackBar from "../../components/UI/snackBar";
+import {
+  createGenderStr,
+  createPrefStr,
+  createDisplayHobbies,
+} from "../../utils/createStr";
 
 const Confirm = () => {
   const [progress, setProgress] = useState(false);
@@ -28,24 +29,12 @@ const Confirm = () => {
   const prefecturesById = useAppSelector(selectPrefecturesById);
   const hobbiesById = useAppSelector(selectedHobbiesById);
 
-  const genderDisplay = (gender: string) => {
-    return gender === "1" ? "男性" : "女性";
-  };
-
   const createDisplayAddress = (prefecture: string, address: string) => {
-    const suffix = prefectureSuffix(prefecture);
+    const prefStr = createPrefStr(prefecture, prefecturesById);
     // 戻るボタンで入力項目の初期化対応
     if (prefecture === "-1") return "";
 
-    return `${prefecturesById[prefecture].Name}${suffix} ${address}`;
-  };
-
-  const prefectureSuffix = (prefecture: string) => {
-    if (prefecture === HOKKAIDO_ID) return "";
-    if (prefecture === TOKYO_ID) return "都";
-    if (PREF_ARR.includes(prefecture)) return "府";
-
-    return "県";
+    return `${prefStr} ${address}`;
   };
 
   const backInputView = () => {
@@ -76,14 +65,6 @@ const Confirm = () => {
     }
   };
 
-  const createDisplayHobbies = () => {
-    const hobbyConv = hobbies
-      .map((hobby) => hobbiesById[hobby].Name)
-      .join("　");
-
-    return hobbyConv;
-  };
-
   const closeSnackBar = () => {
     setFailed(false);
   };
@@ -108,7 +89,7 @@ const Confirm = () => {
             </tr>
             <tr>
               <td>性別</td>
-              <td>{genderDisplay(gender)}</td>
+              <td>{createGenderStr(gender)}</td>
             </tr>
             <tr>
               <td>住所</td>
@@ -116,7 +97,7 @@ const Confirm = () => {
             </tr>
             <tr>
               <td>趣味</td>
-              <td>{createDisplayHobbies()}</td>
+              <td>{createDisplayHobbies(hobbies, hobbiesById)}</td>
             </tr>
             <tr>
               <td>自己紹介</td>

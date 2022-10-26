@@ -19,12 +19,20 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { profileResult, setProfiles } from "../store/slices/profileSclice";
-import { setUpdateProfile } from "../store/slices/registSlice";
-import { selectSearch } from "../store/slices/searchSlice";
-import { genderDisplay, prefectureSuffix } from "../utils/createStr";
-import { Profile } from "../models/profileModel";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { profileResult, setProfiles } from "../../store/slices/profileSclice";
+import { setUpdateProfile } from "../../store/slices/registSlice";
+import { selectSearch } from "../../store/slices/searchSlice";
+import {
+  selectPrefecturesById,
+  selectedHobbiesById,
+} from "../../store/slices/masterDataSlice";
+import {
+  createGenderStr,
+  createPrefStr,
+  createDisplayHobbies,
+} from "../../utils/createStr";
+import { Profile } from "../../models/profileModel";
 import SnackBar from "../UI/snackBar";
 import BackDrop from "../UI/backdrop";
 
@@ -47,6 +55,8 @@ const SearchResults = () => {
     getProfiles();
   }, []);
   const profiles = useAppSelector(profileResult);
+  const prefecturesById = useAppSelector(selectPrefecturesById);
+  const hobbiesById = useAppSelector(selectedHobbiesById);
 
   const deleteConfim = (userId: string, userName: string) => {
     setDeleteUser({ ...deleteUser, userId, userName });
@@ -159,13 +169,13 @@ const SearchResults = () => {
                   {profile.selfDescription}
                 </TableCell>
                 <TableCell component="th" align="right">
-                  {genderDisplay(profile.gender)}
+                  {createGenderStr(profile.gender)}
                 </TableCell>
                 <TableCell component="th" align="right">
-                  {profile.userId}
+                  {createDisplayHobbies(profile.hobbies, hobbiesById)}
                 </TableCell>
                 <TableCell component="th" align="right">
-                  {prefectureSuffix(profile.prefecture)}
+                  {createPrefStr(profile.prefecture, prefecturesById)}
                 </TableCell>
                 <TableCell component="th" align="right">
                   <DeleteIcon

@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-// ProfileCreateHandler is to crate user_profiles
-func ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
+// CreateProfileHandler is to crate user_profiles
+func CreateProfileHandler(w http.ResponseWriter, r *http.Request) {
 	err := profile.CreateProfile(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -17,14 +17,19 @@ func ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// UpdateHandler is to update user_profiles
-func UpdateHandler(w http.ResponseWriter, r *http.Request) {
-	profile.UpdateProfile(r)
+// UpdateProfileHandler is to update user_profiles
+func UpdateProfileHandler(w http.ResponseWriter, r *http.Request) {
+	err := profile.UpdateProfile(r)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 }
 
-// DeleteHandler is to delete user_profiles
-func DeleteHandler(w http.ResponseWriter, r *http.Request) {
+// DeleteProfileHandler is to delete user_profiles
+func DeleteProfileHandler(w http.ResponseWriter, r *http.Request) {
 	err := profile.DeleteProfile(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

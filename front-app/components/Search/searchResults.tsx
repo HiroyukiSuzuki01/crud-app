@@ -63,23 +63,27 @@ const SearchResults = () => {
   };
 
   const deleteHandler = async () => {
-    const url = "http://localhost:8080/profile/delete";
     const deleteData = {
       userId: deleteUser.userId,
     };
     try {
-      await axios.delete(url, { data: deleteData });
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/delete`,
+        { data: deleteData }
+      );
       confirmClose();
       setProgress(true);
 
-      const getUrl = "http://localhost:8080/profile/search";
-      const { data } = await axios.get<Profile[]>(getUrl, {
-        params: {
-          name: searchName,
-          prefID: searchPref,
-          hobbies: searchHobbies,
-        },
-      });
+      const { data } = await axios.get<Profile[]>(
+        `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/search`,
+        {
+          params: {
+            name: searchName,
+            prefID: searchPref,
+            hobbies: searchHobbies,
+          },
+        }
+      );
       dispatch(setProfiles(data));
       setProgress(false);
     } catch (e) {

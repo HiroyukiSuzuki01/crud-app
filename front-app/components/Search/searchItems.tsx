@@ -63,16 +63,18 @@ const SearchItems = () => {
 
   const onSubmitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const url = "http://localhost:8080/profile/search";
     try {
       setProgress(true);
-      const { data } = await axios.get<Profile[]>(url, {
-        params: {
-          name: searchName,
-          prefID: searchPref,
-          hobbies: searchHobbies,
-        },
-      });
+      const { data } = await axios.get<Profile[]>(
+        `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/search`,
+        {
+          params: {
+            name: searchName,
+            prefID: searchPref,
+            hobbies: searchHobbies,
+          },
+        }
+      );
       dispatch(setProfiles(data));
       setProgress(false);
     } catch (e) {

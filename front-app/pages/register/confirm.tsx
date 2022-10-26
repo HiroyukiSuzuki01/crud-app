@@ -53,10 +53,11 @@ const Confirm = () => {
       prefecture,
       address,
     };
-    // envにurlを寄せたい
-    const url = "http://localhost:8080/profile/create";
     try {
-      // await axios.post(url, registData);
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/create`,
+        registData
+      );
       router.replace("/register/complete");
     } catch (e) {
       console.error(e);

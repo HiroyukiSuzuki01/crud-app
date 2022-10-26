@@ -84,8 +84,9 @@ const Register = () => {
   useEffect(() => {
     // dispatch(reset());
     const getMaster = async () => {
-      const url = "http://localhost:8080/masterData";
-      const { data } = await axios.get<MasterDataProps>(url);
+      const { data } = await axios.get<MasterDataProps>(
+        `${process.env.NEXT_PUBLIC_BACK_END_URL}/masterData`
+      );
       dispatch(setPrefectures(data.allPrefectures));
       dispatch(setHobbies(data.allHobbies));
     };

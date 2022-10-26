@@ -26,7 +26,7 @@ const Search = (props: MasterDataProps) => {
 
 export async function getStaticProps() {
   const { data } = await axios.get<MasterDataProps>(
-    "http://backend-app:8080/masterData"
+    `${process.env.REACT_APP_BACK_END_SERVER_SIDE_URL}/masterData`
   );
 
   return {

@@ -14,6 +14,8 @@ export const createPrefStr = (
   prefecturesById: MasterById
 ) => {
   let prefSuffix = "県";
+  if (prefecture === "-1") return "";
+
   switch (prefecture) {
     case HOKKAIDO_ID:
       prefSuffix = "";

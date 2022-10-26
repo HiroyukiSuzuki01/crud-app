@@ -18,33 +18,45 @@ import {
   createPrefStr,
   createDisplayHobbies,
 } from "../../utils/createStr";
+import { InitProfile, Profile } from "../../models/profileModel";
 
 const Confirm = () => {
   const [progress, setProgress] = useState(false);
   const [failed, setFailed] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { name, age, gender, selfDescription, hobbies, prefecture, address } =
-    useAppSelector(selectRegist);
+  const {
+    userId,
+    name,
+    age,
+    gender,
+    selfDescription,
+    hobbies,
+    prefecture,
+    address,
+  } = useAppSelector(selectRegist);
   const prefecturesById = useAppSelector(selectPrefecturesById);
   const hobbiesById = useAppSelector(selectedHobbiesById);
 
   const createDisplayAddress = (prefecture: string, address: string) => {
     const prefStr = createPrefStr(prefecture, prefecturesById);
     // 戻るボタンで入力項目の初期化対応
-    if (prefecture === "-1") return "";
+    if (prefStr === "") return "";
 
     return `${prefStr} ${address}`;
   };
 
   const backInputView = () => {
-    dispatch(reset());
+    if (!userId) {
+      dispatch(reset());
+    }
     router.replace("/register");
   };
 
   const registHandler = async () => {
     setProgress(true);
-    const registData = {
+
+    const registData: InitProfile = {
       name,
       age,
       gender,
@@ -53,7 +65,9 @@ const Confirm = () => {
       prefecture,
       address,
     };
+
     try {
+      setProgress(false);
       await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/create`,
         registData
@@ -66,8 +80,51 @@ const Confirm = () => {
     }
   };
 
+  const updateHandler = async () => {
+    setProgress(true);
+    const registData: Profile = {
+      userId,
+      name,
+      age,
+      gender,
+      selfDescription,
+      hobbies,
+      prefecture,
+      address,
+    };
+
+    try {
+      setProgress(false);
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/update`,
+        registData
+      );
+      router.replace("/register/complete");
+    } catch (e) {
+      console.error(e);
+      setProgress(false);
+      setFailed(true);
+    }
+  };
+
   const closeSnackBar = () => {
     setFailed(false);
+  };
+
+  const actionArea = () => {
+    if (!userId) {
+      return (
+        <Button type="button" variant="contained" onClick={registHandler}>
+          登録する
+        </Button>
+      );
+    } else {
+      return (
+        <Button type="button" variant="contained" onClick={updateHandler}>
+          更新する
+        </Button>
+      );
+    }
   };
 
   return (
@@ -108,9 +165,7 @@ const Confirm = () => {
         </table>
 
         <Stack direction="row" spacing={3}>
-          <Button type="button" variant="contained" onClick={registHandler}>
-            登録する
-          </Button>
+          {actionArea()}
           <Button
             type="button"
             variant="contained"

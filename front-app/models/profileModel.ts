@@ -1,5 +1,4 @@
-export interface Profile {
-  userId: string;
+export interface InitProfile {
   name: string;
   age: string;
   selfDescription: string;
@@ -7,4 +6,8 @@ export interface Profile {
   hobbies: string[];
   prefecture: string;
   address: string;
+}
+
+export interface Profile extends InitProfile {
+  userId: string;
 }

@@ -8,6 +8,7 @@ type Master struct {
 
 // Profile type
 type Profile struct {
+	UserID          string   `json:"userId"`
 	Name            string   `json:"name"`
 	Age             string   `json:"age"`
 	Gender          string   `json:"gender"`

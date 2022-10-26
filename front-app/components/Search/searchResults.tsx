@@ -35,6 +35,7 @@ import {
 import { Profile } from "../../models/profileModel";
 import SnackBar from "../UI/snackBar";
 import BackDrop from "../UI/backdrop";
+import CustomDialog from "../UI/customDialog";
 
 const SearchResults = () => {
   const router = useRouter();
@@ -213,24 +214,14 @@ const SearchResults = () => {
         </Table>
       </TableContainer>
 
-      <Dialog
+      <CustomDialog
         open={deleteConfirm}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">削除確認</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {`${deleteUser.userName}さんを削除します。よろしいですか?`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={confirmClose}>キャンセル</Button>
-          <Button onClick={deleteHandler} autoFocus>
-            削除
-          </Button>
-        </DialogActions>
-      </Dialog>
+        title="削除確認"
+        message={`${deleteUser.userName}さんを削除します。よろしいですか?`}
+        cancel={confirmClose}
+        exec={deleteHandler}
+        action="削除"
+      />
 
       <BackDrop progress={progress} />
       <SnackBar

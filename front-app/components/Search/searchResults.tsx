@@ -12,6 +12,8 @@ import TablePagination from "@mui/material/TablePagination";
 import Paper from "@mui/material/Paper";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import { Stack } from "@mui/material";
+import Grid from "@mui/material/Unstable_Grid2";
 
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { profileResult, setProfiles } from "../../store/slices/profileSclice";
@@ -30,6 +32,7 @@ import { Profile } from "../../models/profileModel";
 import SnackBar from "../UI/snackBar";
 import BackDrop from "../UI/backdrop";
 import CustomDialog from "../UI/customDialog";
+import classes from "./searchResult.module.css";
 
 const SearchResults = () => {
   const router = useRouter();
@@ -137,7 +140,7 @@ const SearchResults = () => {
 
   return (
     <>
-      <TableContainer component={Paper}>
+      <Grid xs={11}>
         <Table aria-label="custom pagination table">
           <TableHead>
             <TableRow>
@@ -148,7 +151,6 @@ const SearchResults = () => {
               <TableCell>趣味</TableCell>
               <TableCell>住所</TableCell>
               <TableCell></TableCell>
-              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -158,31 +160,27 @@ const SearchResults = () => {
               : profiles
             ).map((profile) => (
               <TableRow key={profile.name}>
-                <TableCell component="th" scope="row">
-                  {profile.name}
-                </TableCell>
-                <TableCell component="th" align="right">
-                  {profile.age}
-                </TableCell>
-                <TableCell component="th" align="right">
-                  {profile.selfDescription}
-                </TableCell>
-                <TableCell component="th" align="right">
-                  {createGenderStr(profile.gender)}
-                </TableCell>
-                <TableCell component="th" align="right">
+                <TableCell>{profile.name}</TableCell>
+                <TableCell>{profile.age}</TableCell>
+                <TableCell>{profile.selfDescription}</TableCell>
+                <TableCell>{createGenderStr(profile.gender)}</TableCell>
+                <TableCell>
                   {createDisplayHobbies(profile.hobbies, hobbiesById)}
                 </TableCell>
-                <TableCell component="th" align="right">
+                <TableCell>
                   {createPrefStr(profile.prefecture, prefecturesById)}
                 </TableCell>
-                <TableCell component="th" align="right">
-                  <DeleteIcon
-                    onClick={() => deleteConfim(profile.userId, profile.name)}
-                  />
-                </TableCell>
-                <TableCell component="th" align="right">
-                  <EditIcon onClick={() => updateHandler(profile.userId)} />
+                <TableCell>
+                  <Stack direction="row" spacing={1}>
+                    <DeleteIcon
+                      className={classes.actionIcon}
+                      onClick={() => deleteConfim(profile.userId, profile.name)}
+                    />
+                    <EditIcon
+                      className={classes.actionIcon}
+                      onClick={() => updateHandler(profile.userId)}
+                    />
+                  </Stack>
                 </TableCell>
               </TableRow>
             ))}
@@ -210,7 +208,7 @@ const SearchResults = () => {
             </TableRow>
           </TableFooter>
         </Table>
-      </TableContainer>
+      </Grid>
 
       <CustomDialog
         open={deleteConfirm}

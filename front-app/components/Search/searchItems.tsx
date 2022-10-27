@@ -107,7 +107,7 @@ const SearchItems = () => {
       >
         <form onSubmit={(event) => onSubmitHandler(event)}>
           <Grid>
-            <Stack direction="row" spacing={3}>
+            <Stack direction="row" spacing={6}>
               <FormControl>
                 <InputLabel htmlFor="name-input">名前</InputLabel>
                 <OutlinedInput

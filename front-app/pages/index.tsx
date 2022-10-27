@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect } from "react";
+import Grid from "@mui/material/Unstable_Grid2";
 
 import SearchItems from "../components/Search/searchItems";
 import SearchResults from "../components/Search/searchResults";
@@ -17,10 +18,16 @@ const Search = (props: MasterDataProps) => {
   }, []);
 
   return (
-    <>
+    <Grid
+      container
+      direction="column"
+      alignItems="center"
+      justifyContent="center"
+      spacing={4}
+    >
       <SearchItems />
       <SearchResults />
-    </>
+    </Grid>
   );
 };
 

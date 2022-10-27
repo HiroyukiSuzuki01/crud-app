@@ -27,6 +27,7 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
       open={open}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
+      fullWidth={true}
     >
       <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
       <DialogContent>

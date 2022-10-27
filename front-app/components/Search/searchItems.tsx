@@ -8,9 +8,11 @@ import {
   OutlinedInput,
   Checkbox,
   FormGroup,
+  Stack,
 } from "@mui/material";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
+import FormLabel from "@mui/material/FormLabel";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Unstable_Grid2";
 
@@ -96,36 +98,54 @@ const SearchItems = () => {
 
   return (
     <>
-      <Grid>
+      <Grid
+        container
+        direction="column"
+        alignItems="center"
+        justifyContent="center"
+        spacing={4}
+      >
         <form onSubmit={(event) => onSubmitHandler(event)}>
-          <FormControl>
-            <InputLabel htmlFor="name-input">名前</InputLabel>
-            <OutlinedInput
-              id="name-input"
-              label="名前"
-              value={searchName}
-              onChange={(event) => dispatch(setSearchName(event.target.value))}
-            />
-          </FormControl>
-          <FormControl>
-            <InputLabel id="prefecture-select-label">都道府県</InputLabel>
-            <Select
-              labelId="prefecture-select-label"
-              label="都道府県"
-              value={searchPref}
-              onChange={(event) => dispatch(setSearchPref(event.target.value))}
-            >
-              {prefecturesOption}
-            </Select>
-          </FormControl>
-          <FormControl component="fieldset">
-            <FormGroup aria-label="position" row>
-              {hobbiesCheck}
-            </FormGroup>
-          </FormControl>
-          <Button type="submit" variant="contained">
-            検索
-          </Button>
+          <Grid>
+            <Stack direction="row" spacing={3}>
+              <FormControl>
+                <InputLabel htmlFor="name-input">名前</InputLabel>
+                <OutlinedInput
+                  id="name-input"
+                  label="名前"
+                  value={searchName}
+                  onChange={(event) =>
+                    dispatch(setSearchName(event.target.value))
+                  }
+                />
+              </FormControl>
+              <FormControl>
+                <InputLabel id="prefecture-select-label">都道府県</InputLabel>
+                <Select
+                  labelId="prefecture-select-label"
+                  label="都道府県"
+                  value={searchPref}
+                  onChange={(event) =>
+                    dispatch(setSearchPref(event.target.value))
+                  }
+                >
+                  {prefecturesOption}
+                </Select>
+              </FormControl>
+              <FormControl component="fieldset">
+                <FormLabel>趣味</FormLabel>
+                <FormGroup aria-label="position" row>
+                  {hobbiesCheck}
+                </FormGroup>
+              </FormControl>
+            </Stack>
+          </Grid>
+
+          <Grid container alignItems="center" justifyContent="center">
+            <Button type="submit" variant="contained">
+              検索
+            </Button>
+          </Grid>
         </form>
       </Grid>
 

@@ -1,4 +1,5 @@
 import axios from "axios";
+import qs from "qs";
 import { useState } from "react";
 import {
   MenuItem,
@@ -72,6 +73,11 @@ const SearchItems = () => {
             name: searchName,
             prefID: searchPref,
             hobbies: searchHobbies,
+          },
+          paramsSerializer: {
+            serialize: (params) => {
+              return qs.stringify(params, { arrayFormat: "comma" });
+            },
           },
         }
       );

@@ -4,7 +4,6 @@ import (
 	"backend-app/internal/config"
 	"backend-app/internal/models"
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strings"
 )
@@ -17,7 +16,9 @@ func SearchProfile(r *http.Request) ([]models.Profile, error) {
 
 	name := r.URL.Query().Get("name")
 	prefID := r.URL.Query().Get("prefID")
-	hobbies := r.URL.Query().Get("hobbies")
+	hobbiesStr := r.URL.Query().Get("hobbies")
+	var hobbies = []string{}
+	hobbies = strings.Split(hobbiesStr, ",")
 
 	queryStr := `
 		SELECT
@@ -32,8 +33,13 @@ func SearchProfile(r *http.Request) ([]models.Profile, error) {
 		FROM user_profiles
 		LEFT JOIN user_profile_hobby ON user_profiles.user_id = user_profile_hobby.user_id
 	`
-	// hobbies := []string{}
 	var args []interface{}
+	if len(name) > 0 {
+		args = append(args, name)
+	}
+	if prefID != "-1" {
+		args = append(args, prefID)
+	}
 	for _, hobby := range hobbies {
 		args = append(args, hobby)
 	}
@@ -48,31 +54,30 @@ func SearchProfile(r *http.Request) ([]models.Profile, error) {
 		if prefID == "-1" && len(hobbies) == 0 {
 			// name only
 			queryStr = queryStr + "WHERE name LIKE CONCAT('%', ?, '%')"
-			rows, err = config.Db.Query(queryStr, name)
+			rows, err = config.Db.Query(queryStr, args...)
 		} else if prefID != "-1" && len(hobbies) == 0 {
 			// name & prefecture
 			queryStr = queryStr + "WHERE name LIKE CONCAT('%', ?, '%')" + " AND prefecture_id = ?"
-			rows, err = config.Db.Query(queryStr, name, prefID)
+			rows, err = config.Db.Query(queryStr, args...)
 		} else if prefID == "-1" && len(hobbies) > 0 {
 			// name & hobby
 			queryStr = queryStr + "WHERE name LIKE CONCAT('%', ?, '%')" + ` AND hobby_id IN ( ` + repeat + ` )`
-			rows, err = config.Db.Query(queryStr, name, hobbies)
+			rows, err = config.Db.Query(queryStr, args...)
 		} else {
 			// name & prefecture & hobby
 			queryStr = queryStr + "WHERE name LIKE CONCAT('%', ?, '%')" + " AND prefecture_id = ?" + ` AND hobby_id IN ( ` + repeat + ` )`
-			rows, err = config.Db.Query(queryStr, name, prefID, hobbies)
+			rows, err = config.Db.Query(queryStr, args...)
 		}
 	} else {
 		if prefID != "-1" {
 			if len(hobbies) > 0 {
 				// prefecutre & hobbies
 				queryStr = queryStr + "WHERE prefecture_id = ?" + ` AND hobby_id IN ( ` + repeat + ` )`
-				rows, err = config.Db.Query(queryStr, prefID, args)
+				rows, err = config.Db.Query(queryStr, args...)
 			} else {
 				// prefecture only
-				fmt.Println("fjijfie")
 				queryStr = queryStr + "WHERE prefecture_id = ?"
-				rows, err = config.Db.Query(queryStr, prefID)
+				rows, err = config.Db.Query(queryStr, args...)
 			}
 		} else if len(hobbies) > 0 {
 			// hobbies only
@@ -85,16 +90,15 @@ func SearchProfile(r *http.Request) ([]models.Profile, error) {
 		rows, err = config.Db.Query(queryStr)
 	}
 	if err != nil {
-		return profiles, nil
+		return profiles, err
 	}
-	fmt.Println(queryStr)
 	defer rows.Close()
 
 	for rows.Next() {
 		var profile models.ReqdProfile
 		if err := rows.Scan(&profile.UserID, &profile.Name, &profile.Age, &profile.Gender,
 			&profile.SelefDescription, &profile.Prefecture, &profile.Address, &profile.Hobby); err != nil {
-			return profiles, nil
+			return profiles, err
 		}
 		reaadProfiles = append(reaadProfiles, profile)
 	}

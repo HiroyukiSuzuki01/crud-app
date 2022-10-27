@@ -2,6 +2,13 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import Button from "@mui/material/Button";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import { Typography } from "@mui/material";
 
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { reset, selectRegist } from "../../store/slices/registSlice";
@@ -19,6 +26,7 @@ import {
   createDisplayHobbies,
 } from "../../utils/createStr";
 import { InitProfile, Profile } from "../../models/profileModel";
+import classes from "./confirm.module.css";
 
 const Confirm = () => {
   const [progress, setProgress] = useState(false);
@@ -134,47 +142,82 @@ const Confirm = () => {
         direction="column"
         alignItems="center"
         justifyContent="center"
+        spacing={4}
       >
-        <table>
-          <tbody>
-            <tr>
-              <td>名前</td>
-              <td>{name}</td>
-            </tr>
-            <tr>
-              <td>年齢</td>
-              <td>{age}</td>
-            </tr>
-            <tr>
-              <td>性別</td>
-              <td>{createGenderStr(gender)}</td>
-            </tr>
-            <tr>
-              <td>住所</td>
-              <td>{createDisplayAddress(prefecture, address)}</td>
-            </tr>
-            <tr>
-              <td>趣味</td>
-              <td>{createDisplayHobbies(hobbies, hobbiesById)}</td>
-            </tr>
-            <tr>
-              <td>自己紹介</td>
-              <td>{selfDescription}</td>
-            </tr>
-          </tbody>
-        </table>
+        <Grid xs={5}>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableBody>
+                <TableRow>
+                  <TableCell
+                    className={`${classes.cellColor} ${classes.cellWidth}`}
+                  >
+                    <Typography variant="h6">名前</Typography>
+                  </TableCell>
+                  <TableCell>{name}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    className={`${classes.cellColor} ${classes.cellWidth}`}
+                  >
+                    <Typography variant="h6">年齢</Typography>
+                  </TableCell>
+                  <TableCell>{age}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    className={`${classes.cellColor} ${classes.cellWidth}`}
+                  >
+                    <Typography variant="h6">性別</Typography>
+                  </TableCell>
+                  <TableCell>{createGenderStr(gender)}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    className={`${classes.cellColor} ${classes.cellWidth}`}
+                  >
+                    <Typography variant="h6">住所</Typography>
+                  </TableCell>
+                  <TableCell>
+                    {createDisplayAddress(prefecture, address)}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    className={`${classes.cellColor} ${classes.cellWidth}`}
+                  >
+                    <Typography variant="h6">趣味</Typography>
+                  </TableCell>
+                  <TableCell>
+                    {createDisplayHobbies(hobbies, hobbiesById)}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    className={`${classes.cellColor} ${classes.cellWidth}`}
+                  >
+                    <Typography variant="h6">自己紹介</Typography>
+                  </TableCell>
+                  <TableCell>{selfDescription}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
 
-        <Stack direction="row" spacing={3}>
-          {actionArea()}
-          <Button
-            type="button"
-            variant="contained"
-            color="warning"
-            onClick={backInputView}
-          >
-            戻る
-          </Button>
-        </Stack>
+        <Grid container alignItems="center" justifyContent="center">
+          <Stack direction="row" spacing={3}>
+            {actionArea()}
+            <Button
+              type="button"
+              variant="contained"
+              color="warning"
+              onClick={backInputView}
+            >
+              戻る
+            </Button>
+          </Stack>
+        </Grid>
       </Grid>
 
       <BackDrop progress={progress} />

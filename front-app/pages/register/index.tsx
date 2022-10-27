@@ -249,6 +249,7 @@ const Register = () => {
         direction="column"
         alignItems="center"
         justifyContent="center"
+        spacing={3}
       >
         <Grid xs={4}>
           <TableContainer component={Paper}>

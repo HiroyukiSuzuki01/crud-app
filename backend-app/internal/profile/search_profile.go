@@ -17,8 +17,10 @@ func SearchProfile(r *http.Request) ([]models.Profile, error) {
 	name := r.URL.Query().Get("name")
 	prefID := r.URL.Query().Get("prefID")
 	hobbiesStr := r.URL.Query().Get("hobbies")
-	var hobbies = []string{}
-	hobbies = strings.Split(hobbiesStr, ",")
+	hobbies := make([]string, 0)
+	if len(hobbiesStr) > 0 {
+		hobbies = strings.Split(hobbiesStr, ",")
+	}
 
 	queryStr := `
 		SELECT

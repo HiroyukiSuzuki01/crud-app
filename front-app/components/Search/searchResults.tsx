@@ -45,8 +45,9 @@ const SearchResults = () => {
 
   useEffect(() => {
     const getProfiles = async () => {
-      const url = "http://localhost:8080/profile/";
-      const { data } = await axios.get(url);
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/`
+      );
       dispatch(setProfiles(data));
     };
     getProfiles();

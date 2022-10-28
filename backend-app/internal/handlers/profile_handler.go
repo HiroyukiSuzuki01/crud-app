@@ -8,8 +8,9 @@ import (
 )
 
 type resultType struct {
-	Profiles []models.Profile `json:"profiles"`
-	Count    int              `json:"count"`
+	Profiles  []models.Profile `json:"profiles"`
+	Count     int              `json:"count"`
+	TotalPage int              `json:"totalPage"`
 }
 
 // CreateProfileHandler is to crate user_profiles
@@ -65,7 +66,7 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 
 // ReadHandler is to fetch user_profiles at init page
 func ReadHandler(w http.ResponseWriter, r *http.Request) {
-	profiles, count, err := profile.ReadProfile()
+	profiles, count, page, err := profile.ReadProfile(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -73,8 +74,9 @@ func ReadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := resultType{
-		Profiles: profiles,
-		Count:    count,
+		Profiles:  profiles,
+		Count:     count,
+		TotalPage: page,
 	}
 	res, err := json.Marshal(data)
 	if err != nil {

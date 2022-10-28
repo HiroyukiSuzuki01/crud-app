@@ -40,17 +40,21 @@ const SearchResults = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [failed, setFailed] = useState(false);
   const [progress, setProgress] = useState(false);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [count, setCount] = useState(10);
 
   useEffect(() => {
     const getProfiles = async () => {
-      const limitPerPage = 10;
       const { data } = await axios.get<Result>(
-        `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/`
+        `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/`,
+        {
+          params: {
+            page,
+          },
+        }
       );
-      console.log(data);
       dispatch(setProfiles(data.profiles));
+      setCount(data.totalPage);
     };
     getProfiles();
   }, []);
@@ -115,7 +119,7 @@ const SearchResults = () => {
   };
 
   const clickPage = (_: any, page: any) => {
-    console.log(page);
+    setPage(page);
     console.log("clickPage");
   };
 

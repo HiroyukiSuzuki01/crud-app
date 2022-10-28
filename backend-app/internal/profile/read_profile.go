@@ -3,12 +3,15 @@ package profile
 import (
 	"backend-app/internal/config"
 	"backend-app/internal/models"
+	"math"
+	"net/http"
+	"strconv"
 )
 
-const limitPerPage = 10
+const limitPerPage = 5
 
 // ReadProfile is read profile.
-func ReadProfile() ([]models.Profile, int, error) {
+func ReadProfile(r *http.Request) ([]models.Profile, int, int, error) {
 	var readProfiles []models.ReqdProfile
 	var profiles []models.Profile
 	profilesByID := map[string]*models.Profile{}
@@ -27,8 +30,16 @@ func ReadProfile() ([]models.Profile, int, error) {
 	count := 0
 	row := config.Db.QueryRow(cntQuery)
 	if err := row.Scan(&count); err != nil {
-		return profiles, 0, err
+		return profiles, 0, 0, err
 	}
+	var i int
+	totalPage := 0
+	page := r.URL.Query().Get("page")
+	i, _ = strconv.Atoi(page)
+	offsetCoefficient := i - 1
+	offset := limitPerPage * offsetCoefficient
+
+	totalPage = int(math.Ceil(float64(count) / float64(limitPerPage)))
 
 	sqlStr := `
 	    SELECT
@@ -46,11 +57,13 @@ func ReadProfile() ([]models.Profile, int, error) {
 			FROM user_profile_hobby AS up
 			GROUP BY up.user_id
 		) AS sub ON u.user_id = sub.user_id
+		LIMIT ?
+		OFFSET ?
 	`
 
-	rows, err := config.Db.Query(sqlStr)
+	rows, err := config.Db.Query(sqlStr, limitPerPage, offset)
 	if err != nil {
-		return profiles, count, err
+		return profiles, count, totalPage, err
 	}
 	defer rows.Close()
 
@@ -58,7 +71,7 @@ func ReadProfile() ([]models.Profile, int, error) {
 		var profile models.ReqdProfile
 		if err := rows.Scan(&profile.UserID, &profile.Name, &profile.Age, &profile.Gender,
 			&profile.SelefDescription, &profile.Prefecture, &profile.Address, &profile.Hobby); err != nil {
-			return profiles, count, err
+			return profiles, count, totalPage, err
 		}
 		readProfiles = append(readProfiles, profile)
 	}
@@ -89,5 +102,5 @@ func ReadProfile() ([]models.Profile, int, error) {
 	for _, v := range profilesByID {
 		profiles = append(profiles, *v)
 	}
-	return profiles, count, nil
+	return profiles, count, totalPage, nil
 }

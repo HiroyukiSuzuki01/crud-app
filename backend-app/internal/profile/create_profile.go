@@ -32,7 +32,7 @@ func CreateProfile(r *http.Request) error {
 	}
 
 	result, err := config.Db.Exec(
-		"INSERT INTO user_profiles(name, age, gender, selfDescription, prefecture_id, address, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+		"INSERT INTO user_profiles(name, age, gender, self_description, prefecture_id, address, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
 		registData.Name, registData.Age, registData.Gender, registData.SelfDescription, registData.Prefecture, registData.Address, time.Now(), time.Now())
 	if err != nil {
 		return err

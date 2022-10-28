@@ -28,7 +28,7 @@ func UpdateProfile(r *http.Request) error {
 		    name = ?,
 			age  = ?,
 			gender = ?,
-			selfDescription = ?,
+			self_description = ?,
 			prefecture_id = ?,
 			address = ?
 		WHERE user_id = ?

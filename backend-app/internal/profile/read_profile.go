@@ -17,7 +17,7 @@ func ReadProfile() ([]models.Profile, error) {
 			user_profiles.name,
 			user_profiles.age,
 			user_profiles.gender,
-			user_profiles.selfDescription,
+			user_profiles.self_description,
 			user_profiles.prefecture_id,
 			user_profiles.address,
 			user_profile_hobby.hobby_id

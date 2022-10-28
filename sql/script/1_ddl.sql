@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS crud_app.user_profiles(
   name varchar(10),
   age int,
   gender int,
-  selfDescription text,
+  self_description text,
   prefecture_id int,
   address varchar(25),
   created_at datetime,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS crud_app.user_profiles(
 );
 
 CREATE TABLE IF NOT EXISTS crud_app.user_profile_hobby(
-  user_id int,
+  user_id int not null,
   hobby_id int not null,
   created_at datetime,
   updated_at datetime,

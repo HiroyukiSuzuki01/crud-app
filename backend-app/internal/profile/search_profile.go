@@ -12,80 +12,91 @@ import (
 func SearchProfile(r *http.Request) ([]models.Profile, error) {
 	var reaadProfiles []models.ReqdProfile
 	profiles := []models.Profile{}
-	profilesByID := map[string]*models.Profile{}
 
 	name := r.URL.Query().Get("name")
 	prefID := r.URL.Query().Get("prefID")
 	hobbiesStr := r.URL.Query().Get("hobbies")
 	hobbies := make([]string, 0)
+
 	if len(hobbiesStr) > 0 {
 		hobbies = strings.Split(hobbiesStr, ",")
 	}
 
 	queryStr := `
-		SELECT
-			user_profiles.user_id,
-			user_profiles.name,
-			user_profiles.age,
-			user_profiles.gender,
-			user_profiles.self_description,
-			user_profiles.prefecture_id,
-			user_profiles.address,
-			user_profile_hobby.hobby_id
-		FROM user_profiles
-		LEFT JOIN user_profile_hobby ON user_profiles.user_id = user_profile_hobby.user_id
+	    SELECT
+			u.user_id,
+			u.name,
+			u.age,
+			u.gender,
+			u.self_description,
+			u.prefecture_id,
+			u.address,
+			sub.hobby_ids
+        FROM user_profiles as u
+		LEFT JOIN (
+			SELECT user_id, GROUP_CONCAT(hobby_id) AS hobby_ids
+			FROM user_profile_hobby AS up
+			GROUP BY up.user_id
+		) AS sub ON u.user_id = sub.user_id
 	`
 	var args []interface{}
+	for _, hobby := range hobbies {
+		args = append(args, hobby)
+	}
 	if len(name) > 0 {
 		args = append(args, name)
 	}
 	if prefID != "-1" {
 		args = append(args, prefID)
 	}
-	for _, hobby := range hobbies {
-		args = append(args, hobby)
-	}
+
 	repeat := "?"
 	if len(hobbies) > 0 {
 		repeat = strings.Repeat("?,", len(hobbies)-1) + "?"
+
+		queryStr = `
+			SELECT
+				u.user_id,
+				u.name,
+				u.age,
+				u.gender,
+				u.self_description,
+				u.prefecture_id,
+				u.address,
+				sub.hobby_ids
+			FROM user_profiles as u
+			INNER JOIN (
+				SELECT user_id, GROUP_CONCAT(hobby_id) AS hobby_ids
+				FROM user_profile_hobby AS up
+				WHERE up.user_id IN (
+					SELECT user_id
+					FROM user_profile_hobby AS up2
+					WHERE up2.hobby_id IN ( ` + repeat + ` )
+				)
+				GROUP BY up.user_id
+			) AS sub ON u.user_id = sub.user_id
+		`
 	}
 
 	var rows *sql.Rows
 	var err error
 	if len(name) > 0 {
-		if prefID == "-1" && len(hobbies) == 0 {
-			// name only
+		if prefID == "-1" {
+			// name only or name and hobby
 			queryStr = queryStr + "WHERE name LIKE CONCAT('%', ?, '%')"
 			rows, err = config.Db.Query(queryStr, args...)
-		} else if prefID != "-1" && len(hobbies) == 0 {
-			// name & prefecture
+		} else {
+			// name & prefecture or name & prefecture & hobby
 			queryStr = queryStr + "WHERE name LIKE CONCAT('%', ?, '%')" + " AND prefecture_id = ?"
 			rows, err = config.Db.Query(queryStr, args...)
-		} else if prefID == "-1" && len(hobbies) > 0 {
-			// name & hobby
-			queryStr = queryStr + "WHERE name LIKE CONCAT('%', ?, '%')" + ` AND hobby_id IN ( ` + repeat + ` )`
-			rows, err = config.Db.Query(queryStr, args...)
-		} else {
-			// name & prefecture & hobby
-			queryStr = queryStr + "WHERE name LIKE CONCAT('%', ?, '%')" + " AND prefecture_id = ?" + ` AND hobby_id IN ( ` + repeat + ` )`
-			rows, err = config.Db.Query(queryStr, args...)
 		}
+	} else if prefID != "-1" {
+		// prefecture only or prefecutre & hobbies
+		queryStr = queryStr + "WHERE prefecture_id = ?"
+		rows, err = config.Db.Query(queryStr, args...)
 	} else {
-		if prefID != "-1" {
-			if len(hobbies) > 0 {
-				// prefecutre & hobbies
-				queryStr = queryStr + "WHERE prefecture_id = ?" + ` AND hobby_id IN ( ` + repeat + ` )`
-				rows, err = config.Db.Query(queryStr, args...)
-			} else {
-				// prefecture only
-				queryStr = queryStr + "WHERE prefecture_id = ?"
-				rows, err = config.Db.Query(queryStr, args...)
-			}
-		} else if len(hobbies) > 0 {
-			// hobbies only
-			queryStr = queryStr + `WHERE hobby_id IN ( ` + repeat + ` )`
-			rows, err = config.Db.Query(queryStr, args...)
-		}
+		// hobby only
+		rows, err = config.Db.Query(queryStr, args...)
 	}
 
 	if rows == nil {
@@ -106,31 +117,23 @@ func SearchProfile(r *http.Request) ([]models.Profile, error) {
 	}
 
 	for _, v := range reaadProfiles {
-		exisProfile, ok := profilesByID[v.UserID]
-		if ok {
-			if v.Hobby.Valid {
-				hobbies := append(exisProfile.Hobbies, v.Hobby.String)
-				profilesByID[v.UserID].Hobbies = hobbies
-			}
-		} else {
-			hobbies := []string{}
-			if v.Hobby.Valid {
-				hobbies = append(hobbies, v.Hobby.String)
-			}
-			profilesByID[v.UserID] = &models.Profile{
-				UserID:          v.UserID,
-				Name:            v.Name,
-				Age:             v.Age,
-				Gender:          v.Gender,
-				SelfDescription: v.SelefDescription,
-				Hobbies:         hobbies,
-				Prefecture:      v.Prefecture,
-				Address:         v.Address,
-			}
+		hobbies := []string{}
+		if v.Hobby.Valid {
+			hobbies = append(hobbies, v.Hobby.String)
 		}
+		profile := &models.Profile{
+			UserID:          v.UserID,
+			Name:            v.Name,
+			Age:             v.Age,
+			Gender:          v.Gender,
+			SelfDescription: v.SelefDescription,
+			Hobbies:         hobbies,
+			Prefecture:      v.Prefecture,
+			Address:         v.Address,
+		}
+
+		profiles = append(profiles, *profile)
 	}
-	for _, v := range profilesByID {
-		profiles = append(profiles, *v)
-	}
+
 	return profiles, nil
 }

@@ -5,28 +5,52 @@ import (
 	"backend-app/internal/models"
 )
 
+const limitPerPage = 10
+
 // ReadProfile is read profile.
-func ReadProfile() ([]models.Profile, error) {
+func ReadProfile() ([]models.Profile, int, error) {
 	var readProfiles []models.ReqdProfile
 	var profiles []models.Profile
 	profilesByID := map[string]*models.Profile{}
 
+	cntQuery := `
+	    SELECT
+		    COUNT(*)
+		FROM user_profiles AS u
+		LEFT JOIN (
+			SELECT user_id, GROUP_CONCAT(hobby_id) AS hobby_ids
+			FROM user_profile_hobby AS up
+			GROUP BY up.user_id
+		) AS sub ON u.user_id = sub.user_id
+	`
+
+	count := 0
+	row := config.Db.QueryRow(cntQuery)
+	if err := row.Scan(&count); err != nil {
+		return profiles, 0, err
+	}
+
 	sqlStr := `
 	    SELECT
-		    user_profiles.user_id,
-			user_profiles.name,
-			user_profiles.age,
-			user_profiles.gender,
-			user_profiles.self_description,
-			user_profiles.prefecture_id,
-			user_profiles.address,
-			user_profile_hobby.hobby_id
-		FROM user_profiles
-		LEFT JOIN user_profile_hobby ON user_profiles.user_id = user_profile_hobby.user_id
+		    u.user_id,
+			u.name,
+			u.age,
+			u.gender,
+			u.self_description,
+			u.prefecture_id,
+			u.address,
+			sub.hobby_ids
+		FROM user_profiles as u
+		LEFT JOIN (
+			SELECT user_id, GROUP_CONCAT(hobby_id) AS hobby_ids
+			FROM user_profile_hobby AS up
+			GROUP BY up.user_id
+		) AS sub ON u.user_id = sub.user_id
 	`
+
 	rows, err := config.Db.Query(sqlStr)
 	if err != nil {
-		return profiles, err
+		return profiles, count, err
 	}
 	defer rows.Close()
 
@@ -34,7 +58,7 @@ func ReadProfile() ([]models.Profile, error) {
 		var profile models.ReqdProfile
 		if err := rows.Scan(&profile.UserID, &profile.Name, &profile.Age, &profile.Gender,
 			&profile.SelefDescription, &profile.Prefecture, &profile.Address, &profile.Hobby); err != nil {
-			return profiles, err
+			return profiles, count, err
 		}
 		readProfiles = append(readProfiles, profile)
 	}
@@ -65,5 +89,5 @@ func ReadProfile() ([]models.Profile, error) {
 	for _, v := range profilesByID {
 		profiles = append(profiles, *v)
 	}
-	return profiles, nil
+	return profiles, count, nil
 }

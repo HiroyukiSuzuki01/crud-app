@@ -1,18 +1,16 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import TableContainer from "@mui/material/TableContainer";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
-import TableFooter from "@mui/material/TableFooter";
-import TablePagination from "@mui/material/TablePagination";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { Stack } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
+import Pagination from "@mui/material/Pagination";
 
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { profileResult, setProfiles } from "../../store/slices/profileSclice";
@@ -27,7 +25,7 @@ import {
   createPrefStr,
   createDisplayHobbies,
 } from "../../utils/createStr";
-import { Profile } from "../../models/profileModel";
+import { Profile, Result } from "../../models/profileModel";
 import SnackBar from "../UI/snackBar";
 import BackDrop from "../UI/backdrop";
 import CustomDialog from "../UI/customDialog";
@@ -42,13 +40,17 @@ const SearchResults = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [failed, setFailed] = useState(false);
   const [progress, setProgress] = useState(false);
+  const [page, setPage] = useState(0);
+  const [count, setCount] = useState(10);
 
   useEffect(() => {
     const getProfiles = async () => {
-      const { data } = await axios.get(
+      const limitPerPage = 10;
+      const { data } = await axios.get<Result>(
         `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/`
       );
-      dispatch(setProfiles(data));
+      console.log(data);
+      dispatch(setProfiles(data.profiles));
     };
     getProfiles();
   }, []);
@@ -112,36 +114,15 @@ const SearchResults = () => {
     router.push("/register");
   };
 
-  // check
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  function createData(name: string, calories: number, fat: number) {
-    return { name, calories, fat };
-  }
-
-  const rows = [
-    createData("Cupcake", 305, 3.7),
-    createData("Donut", 452, 25.0),
-    createData("Eclair", 262, 16.0),
-    createData("Frozen yoghurt", 159, 6.0),
-    createData("Gingerbread", 356, 16.0),
-    createData("Honeycomb", 408, 3.2),
-    createData("Ice cream sandwich", 237, 9.0),
-    createData("Jelly Bean", 375, 0.0),
-    createData("KitKat", 518, 26.0),
-    createData("Lollipop", 392, 0.2),
-    createData("Marshmallow", 318, 0),
-    createData("Nougat", 360, 19.0),
-    createData("Oreo", 437, 18.0),
-  ];
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const clickPage = (_: any, page: any) => {
+    console.log(page);
+    console.log("clickPage");
+  };
 
   return (
     <>
       <Grid xs={11}>
-        <Table aria-label="custom pagination table">
+        <Table className={classes.tableWidth}>
           <TableHead>
             <TableRow>
               <TableCell>名前</TableCell>
@@ -154,60 +135,53 @@ const SearchResults = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {(rowsPerPage > 0
-              ? // ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                profiles
-              : profiles
-            ).map((profile) => (
-              <TableRow key={profile.name}>
-                <TableCell>{profile.name}</TableCell>
-                <TableCell>{profile.age}</TableCell>
-                <TableCell>{profile.selfDescription}</TableCell>
-                <TableCell>{createGenderStr(profile.gender)}</TableCell>
-                <TableCell>
-                  {createDisplayHobbies(profile.hobbies, hobbiesById)}
-                </TableCell>
-                <TableCell>
-                  {createPrefStr(profile.prefecture, prefecturesById)}
-                </TableCell>
-                <TableCell>
-                  <Stack direction="row" spacing={1}>
-                    <DeleteIcon
-                      className={classes.actionIcon}
-                      onClick={() => deleteConfim(profile.userId, profile.name)}
-                    />
-                    <EditIcon
-                      className={classes.actionIcon}
-                      onClick={() => updateHandler(profile.userId)}
-                    />
-                  </Stack>
-                </TableCell>
-              </TableRow>
-            ))}
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
-              </TableRow>
-            )}
+            {profiles.map((profile) => {
+              return (
+                <TableRow key={profile.userId}>
+                  <TableCell>{profile.name}</TableCell>
+                  <TableCell>{profile.age}</TableCell>
+                  <TableCell>{profile.selfDescription}</TableCell>
+                  <TableCell>{createGenderStr(profile.gender)}</TableCell>
+                  <TableCell>
+                    {profile.hobbies.length > 0
+                      ? createDisplayHobbies(profile.hobbies, hobbiesById)
+                      : ""}
+                  </TableCell>
+                  <TableCell>
+                    {createPrefStr(profile.prefecture, prefecturesById)}
+                  </TableCell>
+                  <TableCell>
+                    <Stack direction="row" spacing={1}>
+                      <DeleteIcon
+                        className={classes.actionIcon}
+                        onClick={() =>
+                          deleteConfim(profile.userId, profile.name)
+                        }
+                      />
+                      <EditIcon
+                        className={classes.actionIcon}
+                        onClick={() => updateHandler(profile.userId)}
+                      />
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
-          <TableFooter>
-            <TableRow>
-              {/* <TablePagination
-                rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                colSpan={3}
-                count={profiles.length}
-                rowsPerPage={10}
-                page={page}
-                SelectProps={{
-                  inputProps: {
-                    "aria-label": "rows per page",
-                  },
-                  native: true,
-                }}
-              /> */}
-            </TableRow>
-          </TableFooter>
         </Table>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="center"
+          style={{ marginTop: "15px" }}
+        >
+          <Pagination
+            count={count}
+            page={page}
+            color="primary"
+            onChange={clickPage}
+          />
+        </Grid>
       </Grid>
 
       <CustomDialog

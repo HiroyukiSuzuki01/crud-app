@@ -1,3 +1,7 @@
 .actionIcon {
   cursor: pointer;
 }
+
+.tableWidth {
+  width: 100%;
+}

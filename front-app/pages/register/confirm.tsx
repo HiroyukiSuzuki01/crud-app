@@ -189,7 +189,9 @@ const Confirm = () => {
                     <Typography variant="h6">趣味</Typography>
                   </TableCell>
                   <TableCell>
-                    {createDisplayHobbies(hobbies, hobbiesById)}
+                    {hobbies.length > 0
+                      ? createDisplayHobbies(hobbies, hobbiesById)
+                      : ""}
                   </TableCell>
                 </TableRow>
                 <TableRow>

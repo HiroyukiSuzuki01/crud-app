@@ -11,3 +11,8 @@ export interface InitProfile {
 export interface Profile extends InitProfile {
   userId: string;
 }
+
+export interface Result {
+  profiles: Profile[];
+  count: number;
+}

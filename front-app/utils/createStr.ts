@@ -32,9 +32,10 @@ export const createPrefStr = (
 };
 
 export const createDisplayHobbies = (
-  hobbies: string[],
+  hobbyStr: string[],
   hobbiesById: MasterById
 ) => {
+  const hobbies = hobbyStr[0].split(",");
   const hobbyConv = hobbies.map((hobby) => hobbiesById[hobby].Name).join("　");
 
   return hobbyConv;

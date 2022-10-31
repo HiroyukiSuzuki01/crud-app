@@ -9,7 +9,6 @@ import (
 
 type resultType struct {
 	Profiles  []models.Profile `json:"profiles"`
-	Count     int              `json:"count"`
 	TotalPage int              `json:"totalPage"`
 }
 
@@ -48,13 +47,17 @@ func DeleteProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 // SearchHandler is to search user_profiles
 func SearchHandler(w http.ResponseWriter, r *http.Request) {
-	profiles, err := profile.SearchProfile(r)
+	profiles, totalPage, err := profile.SearchProfile(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 		return
 	}
-	res, err := json.Marshal(profiles)
+	data := resultType{
+		Profiles:  profiles,
+		TotalPage: totalPage,
+	}
+	res, err := json.Marshal(data)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -66,7 +69,7 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 
 // ReadHandler is to fetch user_profiles at init page
 func ReadHandler(w http.ResponseWriter, r *http.Request) {
-	profiles, count, page, err := profile.ReadProfile(r)
+	profiles, totalPage, err := profile.ReadProfile(r)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -75,8 +78,7 @@ func ReadHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := resultType{
 		Profiles:  profiles,
-		Count:     count,
-		TotalPage: page,
+		TotalPage: totalPage,
 	}
 	res, err := json.Marshal(data)
 	if err != nil {

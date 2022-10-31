@@ -14,6 +14,5 @@ export interface Profile extends InitProfile {
 
 export interface Result {
   profiles: Profile[];
-  count: number;
   totalPage: number;
 }

@@ -11,10 +11,9 @@ import (
 const limitPerPage = 5
 
 // ReadProfile is read profile.
-func ReadProfile(r *http.Request) ([]models.Profile, int, int, error) {
+func ReadProfile(r *http.Request) ([]models.Profile, int, error) {
 	var readProfiles []models.ReqdProfile
 	var profiles []models.Profile
-	profilesByID := map[string]*models.Profile{}
 
 	cntQuery := `
 	    SELECT
@@ -28,12 +27,12 @@ func ReadProfile(r *http.Request) ([]models.Profile, int, int, error) {
 	`
 
 	count := 0
+	totalPage := 0
 	row := config.Db.QueryRow(cntQuery)
 	if err := row.Scan(&count); err != nil {
-		return profiles, 0, 0, err
+		return profiles, totalPage, err
 	}
 	var i int
-	totalPage := 0
 	page := r.URL.Query().Get("page")
 	i, _ = strconv.Atoi(page)
 	offsetCoefficient := i - 1
@@ -63,7 +62,7 @@ func ReadProfile(r *http.Request) ([]models.Profile, int, int, error) {
 
 	rows, err := config.Db.Query(sqlStr, limitPerPage, offset)
 	if err != nil {
-		return profiles, count, totalPage, err
+		return profiles, totalPage, err
 	}
 	defer rows.Close()
 
@@ -71,36 +70,28 @@ func ReadProfile(r *http.Request) ([]models.Profile, int, int, error) {
 		var profile models.ReqdProfile
 		if err := rows.Scan(&profile.UserID, &profile.Name, &profile.Age, &profile.Gender,
 			&profile.SelefDescription, &profile.Prefecture, &profile.Address, &profile.Hobby); err != nil {
-			return profiles, count, totalPage, err
+			return profiles, totalPage, err
 		}
 		readProfiles = append(readProfiles, profile)
 	}
 	for _, v := range readProfiles {
-		exisProfile, ok := profilesByID[v.UserID]
-		if ok {
-			if v.Hobby.Valid {
-				hobbies := append(exisProfile.Hobbies, v.Hobby.String)
-				profilesByID[v.UserID].Hobbies = hobbies
-			}
-		} else {
-			hobbies := []string{}
-			if v.Hobby.Valid {
-				hobbies = append(hobbies, v.Hobby.String)
-			}
-			profilesByID[v.UserID] = &models.Profile{
-				UserID:          v.UserID,
-				Name:            v.Name,
-				Age:             v.Age,
-				Gender:          v.Gender,
-				SelfDescription: v.SelefDescription,
-				Hobbies:         hobbies,
-				Prefecture:      v.Prefecture,
-				Address:         v.Address,
-			}
+		hobbies := []string{}
+		if v.Hobby.Valid {
+			hobbies = append(hobbies, v.Hobby.String)
 		}
+		profile := &models.Profile{
+			UserID:          v.UserID,
+			Name:            v.Name,
+			Age:             v.Age,
+			Gender:          v.Gender,
+			SelfDescription: v.SelefDescription,
+			Hobbies:         hobbies,
+			Prefecture:      v.Prefecture,
+			Address:         v.Address,
+		}
+
+		profiles = append(profiles, *profile)
 	}
-	for _, v := range profilesByID {
-		profiles = append(profiles, *v)
-	}
-	return profiles, count, totalPage, nil
+
+	return profiles, totalPage, nil
 }

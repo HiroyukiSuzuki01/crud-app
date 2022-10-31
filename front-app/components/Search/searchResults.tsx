@@ -1,4 +1,5 @@
 import axios from "axios";
+import qs from "qs";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Table from "@mui/material/Table";
@@ -15,7 +16,7 @@ import Pagination from "@mui/material/Pagination";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { profileResult, setProfiles } from "../../store/slices/profileSclice";
 import { setUpdateProfile } from "../../store/slices/registSlice";
-import { selectSearch } from "../../store/slices/searchSlice";
+import { selectSearch, setPageInfo } from "../../store/slices/searchSlice";
 import {
   selectPrefecturesById,
   selectedHobbiesById,
@@ -34,14 +35,12 @@ import classes from "./searchResult.module.css";
 const SearchResults = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { searchName, searchPref, searchHobbies } =
+  const { searchName, searchPref, searchHobbies, page, totalPage } =
     useAppSelector(selectSearch);
   const [deleteUser, setDeleteUser] = useState({ userId: "", userName: "" });
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [failed, setFailed] = useState(false);
   const [progress, setProgress] = useState(false);
-  const [page, setPage] = useState(1);
-  const [count, setCount] = useState(10);
 
   useEffect(() => {
     const getProfiles = async () => {
@@ -49,12 +48,12 @@ const SearchResults = () => {
         `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/`,
         {
           params: {
-            page,
+            page: page,
           },
         }
       );
       dispatch(setProfiles(data.profiles));
-      setCount(data.totalPage);
+      dispatch(setPageInfo({ page: page, totalPage: data.totalPage }));
     };
     getProfiles();
   }, []);
@@ -83,17 +82,25 @@ const SearchResults = () => {
       confirmClose();
       setProgress(true);
 
-      const { data } = await axios.get<Profile[]>(
+      const initPage = 1;
+      const { data } = await axios.get<Result>(
         `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/search`,
         {
           params: {
             name: searchName,
             prefID: searchPref,
             hobbies: searchHobbies,
+            page: initPage,
+          },
+          paramsSerializer: {
+            serialize: (params) => {
+              return qs.stringify(params, { arrayFormat: "comma" });
+            },
           },
         }
       );
-      dispatch(setProfiles(data));
+      dispatch(setProfiles(data.profiles));
+      dispatch(setPageInfo({ page: initPage, totalPage: data.totalPage }));
       setProgress(false);
     } catch (e) {
       confirmClose();
@@ -118,9 +125,32 @@ const SearchResults = () => {
     router.push("/register");
   };
 
-  const clickPage = (_: any, page: any) => {
-    setPage(page);
-    console.log("clickPage");
+  const clickPage = async (_: any, page: any) => {
+    setProgress(true);
+    try {
+      const { data } = await axios.get<Result>(
+        `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/search`,
+        {
+          params: {
+            name: searchName,
+            prefID: searchPref,
+            hobbies: searchHobbies,
+            page: page,
+          },
+          paramsSerializer: {
+            serialize: (params) => {
+              return qs.stringify(params, { arrayFormat: "comma" });
+            },
+          },
+        }
+      );
+      dispatch(setProfiles(data.profiles));
+      dispatch(setPageInfo({ page: page, totalPage: data.totalPage }));
+      setProgress(false);
+    } catch (e) {
+      console.log(e);
+      setProgress(false);
+    }
   };
 
   return (
@@ -180,7 +210,7 @@ const SearchResults = () => {
           style={{ marginTop: "15px" }}
         >
           <Pagination
-            count={count}
+            count={totalPage}
             page={page}
             color="primary"
             onChange={clickPage}

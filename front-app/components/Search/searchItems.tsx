@@ -27,8 +27,9 @@ import {
   setSearchName,
   setSearchPref,
   setSearchHobbies,
+  setPageInfo,
 } from "../../store/slices/searchSlice";
-import { Profile } from "../../models/profileModel";
+import { Result } from "../../models/profileModel";
 import SnackBar from "../UI/snackBar";
 import BackDrop from "../UI/backdrop";
 
@@ -68,13 +69,15 @@ const SearchItems = () => {
     event.preventDefault();
     try {
       setProgress(true);
-      const { data } = await axios.get<Profile[]>(
+      const initPage = 1;
+      const { data } = await axios.get<Result>(
         `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/search`,
         {
           params: {
             name: searchName,
             prefID: searchPref,
             hobbies: searchHobbies,
+            page: initPage,
           },
           paramsSerializer: {
             serialize: (params) => {
@@ -83,7 +86,8 @@ const SearchItems = () => {
           },
         }
       );
-      dispatch(setProfiles(data));
+      dispatch(setPageInfo({ page: initPage, totalPage: data.totalPage }));
+      dispatch(setProfiles(data.profiles));
       setProgress(false);
     } catch (e) {
       console.error(e);

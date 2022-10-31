@@ -4,7 +4,6 @@ import (
 	"backend-app/internal/config"
 	"backend-app/internal/models"
 	"database/sql"
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -75,7 +74,6 @@ func SearchProfile(r *http.Request) ([]models.Profile, int, error) {
 	}
 	args = append(args, limitPerPage)
 	args = append(args, offset)
-	fmt.Println(args)
 
 	repeat := "?"
 	if len(hobbies) > 0 {

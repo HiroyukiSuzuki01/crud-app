@@ -25,7 +25,7 @@ func main() {
 	defer config.Db.Close()
 
 	cors := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
+		AllowedOrigins: []string{"http://localhost:3000"},
 		AllowedMethods: []string{
 			http.MethodPost,
 			http.MethodGet,
@@ -34,7 +34,7 @@ func main() {
 			http.MethodDelete,
 		},
 		AllowedHeaders:   []string{"*"},
-		AllowCredentials: false,
+		AllowCredentials: true,
 	})
 
 	mux := routes()

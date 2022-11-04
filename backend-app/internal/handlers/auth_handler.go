@@ -3,7 +3,6 @@ package handlers
 import (
 	"backend-app/internal/auth"
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -21,6 +20,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 	}
+	cookie := &http.Cookie{
+		Name:     "token",
+		Value:    token,
+		Path:     "/",
+		MaxAge:   60 * 60,
+		HttpOnly: true,
+	}
+	http.SetCookie(w, cookie)
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(res)
@@ -28,7 +35,15 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 // LogoutHandler crud_app
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("aa")
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+	}
+	cookie.MaxAge = -1
+	cookie.Path = "/"
+	cookie.HttpOnly = true
+	http.SetCookie(w, cookie)
 	w.WriteHeader(http.StatusOK)
 }
 

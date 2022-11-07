@@ -41,19 +41,26 @@ const SearchResults = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [failed, setFailed] = useState(false);
   const [progress, setProgress] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const getProfiles = async () => {
-      const { data } = await axios.get<Result>(
-        `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/`,
-        {
-          params: {
-            page: page,
-          },
-        }
-      );
-      dispatch(setProfiles(data.profiles));
-      dispatch(setPageInfo({ page: page, totalPage: data.totalPage }));
+      try {
+        const { data } = await axios.get<Result>(
+          `${process.env.NEXT_PUBLIC_BACK_END_URL}/profile/`,
+          {
+            params: {
+              page: page,
+            },
+          }
+        );
+        dispatch(setProfiles(data.profiles));
+        dispatch(setPageInfo({ page: page, totalPage: data.totalPage }));
+      } catch (e) {
+        console.error(e);
+        setErrorMessage("データ取得に失敗しました");
+        setFailed(true);
+      }
     };
     getProfiles();
   }, []);
@@ -104,6 +111,7 @@ const SearchResults = () => {
       setProgress(false);
     } catch (e) {
       confirmClose();
+      setErrorMessage("データ削除に失敗しました");
       setFailed(true);
     }
   };
@@ -232,7 +240,7 @@ const SearchResults = () => {
         open={failed}
         close={closeSnackBar}
         duration={6000}
-        message="削除に失敗しました"
+        message={errorMessage}
       />
     </>
   );

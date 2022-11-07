@@ -3,6 +3,7 @@ import registSlice from "./slices/registSlice";
 import masterDataSlice from "./slices/masterDataSlice";
 import profileSlice from "./slices/profileSclice";
 import searchSlice from "./slices/searchSlice";
+import authSlice from "./slices/authSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     masterData: masterDataSlice,
     profile: profileSlice,
     search: searchSlice,
+    auth: authSlice,
   },
 });
 

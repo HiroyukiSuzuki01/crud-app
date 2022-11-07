@@ -1,4 +1,4 @@
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, Snackbar, SnackbarContent } from "@mui/material";
 
 interface SnackBarProps {
   open: boolean;

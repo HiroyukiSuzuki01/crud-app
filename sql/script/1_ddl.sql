@@ -37,3 +37,11 @@ CREATE TABLE IF NOT EXISTS crud_app.user_profile_hobby(
   FOREIGN KEY (hobby_id) REFERENCES hobbies(id),
   UNIQUE (user_id, hobby_id)
 );
+
+CREATE TABLE IF NOT EXISTS crud_app.users(
+  user_id int auto_increment primary key,
+  email varchar(255) not null unique,
+  password varchar(255) not null,
+  created_at datetime,
+  updated_at datetime
+)
